@@ -7,13 +7,35 @@ import androidx.lifecycle.ViewModel;
 public class QuizzViewModel extends ViewModel {
 
     private final MutableLiveData<String> mText;
+    private final MutableLiveData<String> mTextName;
+    private final MutableLiveData<String> mTextHintName;
+    private final MutableLiveData<String> mTextButton;
 
     public QuizzViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is quizz fragment");
+        mTextName = new MutableLiveData<>();
+        mTextHintName = new MutableLiveData<>();
+        mTextButton = new MutableLiveData<>();
+
+        mText.setValue("Bienvenue sur le quizz TeleCoop !");
+        mTextName.setValue("Comment tu t'appelles ?");
+        mTextHintName.setValue("Marque ici ton prénom :)");
+        mTextButton.setValue("C'est parti pour les questions !");
     }
 
     public LiveData<String> getText() {
         return mText;
+    }
+
+    public LiveData<String> getTextName() {
+        return mTextName;
+    }
+
+    public LiveData<String> getTextHintName() {
+        return mTextHintName;
+    }
+
+    public LiveData<String> getTextButton() {
+        return mTextButton;
     }
 }

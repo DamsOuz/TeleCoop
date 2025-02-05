@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -25,7 +26,14 @@ public class QuizzFragment extends Fragment {
         View root = binding.getRoot();
 
         final TextView textView = binding.textQuizz;
+        final TextView textViewName = binding.textFirstname;
+        final EditText textViewHintName = binding.textHintname;
+        final TextView textButton = binding.textButton;
+
         quizzViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        quizzViewModel.getTextName().observe(getViewLifecycleOwner(), textViewName::setText);
+        quizzViewModel.getTextHintName().observe(getViewLifecycleOwner(), textViewHintName::setHint);
+        quizzViewModel.getTextButton().observe(getViewLifecycleOwner(), textButton::setText);
         return root;
     }
 
