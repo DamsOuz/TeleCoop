@@ -10,22 +10,22 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.telecoop.telecoop.databinding.FragmentSlideshowBinding;
+import com.telecoop.telecoop.databinding.FragmentQuizzBinding;
 
-public class SlideshowFragment extends Fragment {
+public class QuizzFragment extends Fragment {
 
-    private FragmentSlideshowBinding binding;
+    private FragmentQuizzBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        SlideshowViewModel slideshowViewModel =
-                new ViewModelProvider(this).get(SlideshowViewModel.class);
+        QuizzViewModel quizzViewModel =
+                new ViewModelProvider(this).get(QuizzViewModel.class);
 
-        binding = FragmentSlideshowBinding.inflate(inflater, container, false);
+        binding = FragmentQuizzBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textSlideshow;
-        slideshowViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        final TextView textView = binding.textQuizz;
+        quizzViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
 
