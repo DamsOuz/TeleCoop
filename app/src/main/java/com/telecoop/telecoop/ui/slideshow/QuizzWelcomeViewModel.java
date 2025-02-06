@@ -4,14 +4,14 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class QuizzViewModel extends ViewModel {
+public class QuizzWelcomeViewModel extends ViewModel {
 
     private final MutableLiveData<String> mText;
     private final MutableLiveData<String> mTextName;
     private final MutableLiveData<String> mTextHintName;
     private final MutableLiveData<String> mTextButton;
 
-    public QuizzViewModel() {
+    public QuizzWelcomeViewModel() {
         mText = new MutableLiveData<>();
         mTextName = new MutableLiveData<>();
         mTextHintName = new MutableLiveData<>();

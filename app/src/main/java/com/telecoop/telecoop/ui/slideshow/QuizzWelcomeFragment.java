@@ -13,25 +13,28 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.telecoop.telecoop.databinding.FragmentQuizzBinding;
+import com.telecoop.telecoop.R;
+import com.telecoop.telecoop.databinding.FragmentWelcomequizzBinding;
 
-public class QuizzFragment extends Fragment {
+public class QuizzWelcomeFragment extends Fragment {
 
-    private FragmentQuizzBinding binding;
+    private FragmentWelcomequizzBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-        binding = FragmentQuizzBinding.inflate(inflater, container, false);
+        binding = FragmentWelcomequizzBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState){
         super.onViewCreated(view, savedInstanceState);
-        QuizzViewModel quizzViewModel =
-                new ViewModelProvider(this).get(QuizzViewModel.class);
+        QuizzWelcomeViewModel quizzViewModel =
+                new ViewModelProvider(this).get(QuizzWelcomeViewModel.class);
 
         final TextView textView = binding.textWelcomequizz;
         final TextView textViewName = binding.textFirstname;
@@ -64,7 +67,11 @@ public class QuizzFragment extends Fragment {
         binding.textButtonFirstpageQuizz.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                //TODO: naviguer vers le fragment de quizz
+                FragmentManager fragmentManager = getParentFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                QuizzContentFragment quizzContentFragment = QuizzContentFragment.newInstance();
+                fragmentTransaction.replace(R.id.nav_host_fragment_content_main, quizzContentFragment);
+                fragmentTransaction.commit();
                 Log.d("Damien", "Clic !");
             }
         });
