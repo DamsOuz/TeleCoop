@@ -8,6 +8,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -19,22 +20,25 @@ public class QuizzFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+
+        binding = FragmentQuizzBinding.inflate(inflater, container, false);
+        return binding.getRoot();
+    }
+
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState){
+        super.onViewCreated(view, savedInstanceState);
         QuizzViewModel quizzViewModel =
                 new ViewModelProvider(this).get(QuizzViewModel.class);
 
-        binding = FragmentQuizzBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
-
-        final TextView textView = binding.textQuizz;
+        final TextView textView = binding.textWelcomequizz;
         final TextView textViewName = binding.textFirstname;
         final EditText textViewHintName = binding.textHintname;
-        final TextView textButton = binding.textButton;
+        final TextView textButton = binding.textButtonFirstpageQuizz;
 
         quizzViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         quizzViewModel.getTextName().observe(getViewLifecycleOwner(), textViewName::setText);
         quizzViewModel.getTextHintName().observe(getViewLifecycleOwner(), textViewHintName::setHint);
         quizzViewModel.getTextButton().observe(getViewLifecycleOwner(), textButton::setText);
-        return root;
     }
 
     @Override
