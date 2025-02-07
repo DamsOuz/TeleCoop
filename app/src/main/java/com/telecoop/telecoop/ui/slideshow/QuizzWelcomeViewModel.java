@@ -17,10 +17,10 @@ public class QuizzWelcomeViewModel extends ViewModel {
         mTextHintName = new MutableLiveData<>();
         mTextButton = new MutableLiveData<>();
 
-        mText.setValue("Bienvenue sur le quizz TeleCoop !");
-        mTextName.setValue("Comment tu t'appelles ?");
+        mText.setValue("Bienvenue dans ta nouvelle vie !");
+        mTextName.setValue("Comment t'appelles-tu ?");
         mTextHintName.setValue("Marque ici ton prénom :)");
-        mTextButton.setValue("C'est parti pour les questions !");
+        mTextButton.setValue("NEXT");
     }
 
     public LiveData<String> getText() {
