@@ -6,7 +6,7 @@
     android:background="#bbdafe"
     android:orientation="vertical"
     android:gravity="center"
-    tools:context=".ui.slideshow.QuizzContentFragment">
+    tools:context=".ui.quizz.QuizzContentFragment">
 
     <TextView
         android:id="@+id/question"

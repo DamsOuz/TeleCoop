@@ -19,13 +19,13 @@
 
     <fragment
         android:id="@+id/nav_quizz"
-        android:name="com.telecoop.telecoop.ui.slideshow.QuizzWelcomeFragment"
+        android:name="com.telecoop.telecoop.ui.quizz.QuizzWelcomeFragment"
         android:label="@string/menu_quizz"
         tools:layout="@layout/fragment_welcomequizz" />
 
     <fragment
         android:id="@+id/nav_quizz_content"
-        android:name="com.telecoop.telecoop.ui.slideshow.QuizzContentFragment"
+        android:name="com.telecoop.telecoop.ui.quizz.QuizzContentFragment"
         android:label="Quizz Content"
         tools:layout="@layout/fragment_quizz_content" />
 

@@ -1,4 +1,4 @@
-package com.telecoop.telecoop.ui.slideshow;
+package com.telecoop.telecoop.ui.quizz;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
