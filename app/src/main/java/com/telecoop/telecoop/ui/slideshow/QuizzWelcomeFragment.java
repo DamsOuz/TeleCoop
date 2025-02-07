@@ -16,6 +16,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.telecoop.telecoop.R;
 import com.telecoop.telecoop.databinding.FragmentWelcomequizzBinding;
@@ -67,12 +69,9 @@ public class QuizzWelcomeFragment extends Fragment {
         binding.textButtonFirstpageQuizz.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                FragmentManager fragmentManager = getParentFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                QuizzContentFragment quizzContentFragment = QuizzContentFragment.newInstance();
-                fragmentTransaction.replace(R.id.nav_host_fragment_content_main, quizzContentFragment);
-                fragmentTransaction.commit();
-                Log.d("Damien", "Clic !");
+                NavController navController = Navigation.findNavController(v);
+                navController.navigate(R.id.action_quizzWelcomeFragment_to_quizzContentFragment);
+                Log.d("Damien", "Navigation vers QuizzContentFragment !");
             }
         });
     }
