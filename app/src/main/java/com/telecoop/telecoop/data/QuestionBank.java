@@ -11,8 +11,8 @@ public class QuestionBank {
                                 "Je veux être plus autonome",
                                 "Je veux arrêter de perdre du temps",
                                 "Je souhaite diminuer mon temps d'écran",
-                                "Je veux retrouver de la joie dans mes utilisations")),
-                                //"Je veux reprendre le contrôle")),
+                                "Je veux retrouver de la joie dans mes utilisations",
+                                "Je veux reprendre le contrôle")),
 
                 new Question("Voici nos suggestions d'objectifs, lequel veux-tu utiliser ?",
                         Arrays.asList(

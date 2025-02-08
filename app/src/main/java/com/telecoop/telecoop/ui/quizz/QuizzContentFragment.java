@@ -53,11 +53,19 @@ public class QuizzContentFragment extends Fragment {
     }
 
     private void updateQuestion(Question question){
+
+        android.widget.Button[] answers = {binding.answer1, binding.answer2, binding.answer3,
+                binding.answer4, binding.answer5};
+
         binding.question.setText(question.getQuestion());
-        binding.answer1.setText(question.getChoiceList().get(0));
-        binding.answer2.setText(question.getChoiceList().get(1));
-        binding.answer3.setText(question.getChoiceList().get(2));
-        binding.answer4.setText(question.getChoiceList().get(3));
+        for(int i = 0; i < question.getChoiceList().size(); i++){
+            answers[i].setText(question.getChoiceList().get(i));
+        }
+
+        for(int i = answers.length; i > question.getChoiceList().size(); i--){
+            answers[i-1].setVisibility(View.GONE);
+        }
+
         binding.next.setText("NEXT");
     }
 
