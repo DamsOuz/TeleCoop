@@ -1,7 +1,8 @@
 package com.telecoop.telecoop.ui.quizz;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -19,14 +20,17 @@ import com.telecoop.telecoop.data.Question;
 import com.telecoop.telecoop.databinding.FragmentQuizzContentBinding;
 import com.telecoop.telecoop.injection.ViewModelFactory;
 
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class QuizzContentFragment extends Fragment {
 
     private QuizzViewModel viewModel;
     private FragmentQuizzContentBinding binding;
-    private int defaultButtonColor;
+    private final int defaultColor = Color.WHITE;
+    private final int selectedColor = Color.BLACK;
+    private Set<Button> selectedButtons = new HashSet<>();
 
     public static QuizzContentFragment newInstance() {
         return new QuizzContentFragment();
@@ -56,7 +60,6 @@ public class QuizzContentFragment extends Fragment {
 
         android.widget.Button[] answers = {binding.answer1, binding.answer2, binding.answer3,
                 binding.answer4, binding.answer5};
-        defaultButtonColor = binding.answer1.getBackgroundTintList().getDefaultColor();
 
         viewModel.currentQuestion.observe(getViewLifecycleOwner(), new Observer<Question>() {
             @Override
@@ -75,13 +78,33 @@ public class QuizzContentFragment extends Fragment {
                     int finalI = i;
                     answers[i].setText(choices.get(i));
                     answers[i].setVisibility(View.VISIBLE);
-                    answers[i].setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            updateAnswer(answers[finalI]);
-                        }
-                    });
+                    answers[i].setOnClickListener(v -> updateAnswer(answers[finalI]));
                 }
+            }
+        });
+
+        binding.next.setOnClickListener(v -> {
+                Boolean isLastQuestion = viewModel.isLastQuestion.getValue();
+                if (isLastQuestion != null && isLastQuestion){
+                    displayResultDialog();
+                } else {
+                    viewModel.nextQuestion();
+                    resetQuestion();
+                    binding.next.setTextColor(Color.GRAY);
+                }
+
+                if (isLastQuestion != null && isLastQuestion){
+                    binding.next.setText("FINISH");
+                } else {
+                    binding.next.setText("NEXT");
+                }
+        });
+
+        viewModel.isLastQuestion.observe(getViewLifecycleOwner(), isLastQuestion -> {
+            if (Boolean.TRUE.equals(isLastQuestion)) {
+                binding.next.setText("FINISH");
+            } else {
+                binding.next.setText("NEXT");
             }
         });
     }
@@ -92,63 +115,64 @@ public class QuizzContentFragment extends Fragment {
                 binding.answer4, binding.answer5};
 
         binding.question.setText(question.getQuestion());
+
         for(int i = 0; i < question.getChoiceList().size(); i++){
-            answers[i].setBackgroundColor(defaultButtonColor);
             answers[i].setText(question.getChoiceList().get(i));
+            answers[i].setBackgroundTintList(android.content.res.ColorStateList.valueOf(defaultColor));
         }
 
         for(int i = answers.length; i > question.getChoiceList().size(); i--){
             answers[i-1].setVisibility(View.GONE);
         }
 
-        binding.next.setText("NEXT");
+        selectedButtons.clear();
         binding.next.setEnabled(false);
+        binding.next.setTextColor(Color.GRAY);
     }
 
     private void updateAnswer(android.widget.Button button){
-
-        if (button.getBackgroundTintList() != null) {
-            int currentColor = button.getBackgroundTintList().getDefaultColor();
-
-            if (currentColor == defaultButtonColor) {
-                button.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.parseColor("#000000")));
+            if (selectedButtons.contains(button)) {
+                button.setBackgroundTintList(android.content.res.ColorStateList.valueOf(defaultColor));
+                selectedButtons.remove(button);
             } else {
-                button.setBackgroundTintList(android.content.res.ColorStateList.valueOf(defaultButtonColor));
+                button.setBackgroundTintList(android.content.res.ColorStateList.valueOf(selectedColor));
+                selectedButtons.add(button);
             }
-        }
-        checkIfNextShouldBeEnabled();
-        enableAllAnswers(true);
-    }
 
-    private void enableAllAnswers(Boolean enable){
-        List<Button> allAnswers = Arrays.asList(binding.answer1, binding.answer2, binding.answer3,
-                binding.answer4, binding.answer5);
-        allAnswers.forEach( answer -> {
-            answer.setEnabled(enable);
-        });
+            checkIfNextShouldBeEnabled();
     }
 
     private void checkIfNextShouldBeEnabled() {
-        boolean isAnySelected = false;
-        List<Button> allAnswers = Arrays.asList(binding.answer1, binding.answer2, binding.answer3,
+        boolean isAnySelected = !selectedButtons.isEmpty();
+        binding.next.setEnabled(isAnySelected);
+        binding.next.setTextColor(isAnySelected ? Color.WHITE : Color.GRAY);
+    }
+
+    private void resetQuestion(){
+        List<Button> allAnswers = List.of(binding.answer1, binding.answer2, binding.answer3,
                 binding.answer4, binding.answer5);
 
-        for (Button button : allAnswers) {
-            if (button.getVisibility() == View.VISIBLE &&
-                    button.getBackgroundTintList() != null &&
-                    button.getBackgroundTintList().getDefaultColor() == Color.parseColor("#000000")) {
-                isAnySelected = true;
-                break;
+        for (Button button : allAnswers){
+            button.setBackgroundTintList(android.content.res.ColorStateList.valueOf(defaultColor));
+        }
+
+        selectedButtons.clear();
+        binding.next.setEnabled(false);
+        binding.next.setTextColor(Color.GRAY);
+    }
+
+    private void displayResultDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+        builder.setTitle("Terminé !");
+        builder.setMessage("Merci d'avoir répondu aux questions :)");
+        builder.setPositiveButton("Quit", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                //goToWelcomeFragment();
             }
-        }
-
-        if (isAnySelected){
-            binding.next.setTextColor(Color.WHITE);
-        } else {
-            binding.next.setTextColor(Color.GRAY);
-        }
-
-        binding.next.setEnabled(isAnySelected);
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
 }

@@ -18,7 +18,13 @@ public class QuestionBank {
                         Arrays.asList(
                                 "Fixer une limite de temps d'écran par jour",
                                 "Fixer des limites par applications par jour",
-                                "Fixer des horaires de temps d'écran limité"))
+                                "Fixer des horaires de temps d'écran limité")),
+                new Question("Ceci est une question test pour mon dev :)",
+                        Arrays.asList(
+                                "Réponse A",
+                                "Réponse B",
+                                "Réponse C",
+                                "Réponse D"))
         );
     }
 
