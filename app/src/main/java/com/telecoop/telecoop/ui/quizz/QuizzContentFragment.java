@@ -1,7 +1,6 @@
 package com.telecoop.telecoop.ui.quizz;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,7 +14,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 
+import com.telecoop.telecoop.R;
 import com.telecoop.telecoop.data.Question;
 import com.telecoop.telecoop.databinding.FragmentQuizzContentBinding;
 import com.telecoop.telecoop.injection.ViewModelFactory;
@@ -27,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.Stack;
 
 public class QuizzContentFragment extends Fragment {
 
@@ -36,7 +37,6 @@ public class QuizzContentFragment extends Fragment {
     private final int defaultColor = Color.WHITE;
     private final int selectedColor = Color.BLACK;
     private Set<Button> selectedButtons = new HashSet<>();
-    private Stack<Question> questionHistory = new Stack<>();
     private Map<Question, Set<Button>> selectedAnswersMap = new HashMap<>();
     private Map<Question, Integer> questionChoicesCount = new HashMap<>();
     private List<Question> questionOrder = new ArrayList<>();
@@ -50,6 +50,10 @@ public class QuizzContentFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         viewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(QuizzViewModel.class);
+
+        if (selectedAnswersMap == null) {
+            selectedAnswersMap = new HashMap<>();
+        }
     }
 
     @Override
@@ -62,6 +66,12 @@ public class QuizzContentFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         viewModel.startQuizz();
+
+        if (!selectedAnswersMap.isEmpty()){
+            Question lastQuestion = questionOrder.get(currentQuestionIndex);
+            updateQuestion(lastQuestion);
+            restoreSelectedAnswers(lastQuestion);
+        }
 
         if (getActivity() != null) {
             ((androidx.appcompat.app.AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -108,7 +118,6 @@ public class QuizzContentFragment extends Fragment {
                     viewModel.nextQuestion();
                 }
 
-                resetQuestion();
                 binding.next.setTextColor(Color.GRAY);
             }
 
@@ -146,12 +155,14 @@ public class QuizzContentFragment extends Fragment {
             new AlertDialog.Builder(requireContext())
                     .setTitle("Quitter le Quiz ?")
                     .setMessage("Voulez-vous vraiment quitter le quiz ?")
-                    .setPositiveButton("Oui", (dialog, which) -> requireActivity().finish())
+                    .setPositiveButton("Oui", (dialog, id) -> {
+                        NavController navController = NavHostFragment.findNavController(this);
+                        navController.navigate(R.id.action_quizzContentFragment_to_homeFragment);
+                    })
                     .setNegativeButton("Non", (dialog, which) -> dialog.dismiss())
                     .show();
         }
     }
-
 
     private void updateQuestion(Question question) {
         Button[] answers = {binding.answer1, binding.answer2, binding.answer3, binding.answer4, binding.answer5};
@@ -224,23 +235,17 @@ public class QuizzContentFragment extends Fragment {
         binding.next.setTextColor(isAnySelected ? Color.WHITE : Color.GRAY);
     }
 
-    private void resetQuestion() {
-        List<Button> allAnswers = List.of(binding.answer1, binding.answer2, binding.answer3, binding.answer4, binding.answer5);
-
-        for (Button button : allAnswers) {
-            button.setBackgroundTintList(android.content.res.ColorStateList.valueOf(defaultColor));
-        }
-
-        selectedButtons.clear();
-        binding.next.setEnabled(false);
-        binding.next.setTextColor(Color.GRAY);
-    }
-
     private void displayResultDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Terminé !");
         builder.setMessage("Merci d'avoir répondu aux questions :)");
-        builder.setPositiveButton("Quit", (dialog, id) -> requireActivity().finish());
+
+        builder.setPositiveButton("Quit", (dialog, id) -> {
+            NavController navController = NavHostFragment.findNavController(this);
+            navController.navigate(R.id.action_quizzContentFragment_to_homeFragment);
+                });
+
+        builder.setNegativeButton("Annuler", (dialog, id) -> dialog.dismiss());
         AlertDialog dialog = builder.create();
         dialog.show();
     }
