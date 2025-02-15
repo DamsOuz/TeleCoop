@@ -9,31 +9,24 @@ import com.telecoop.telecoop.data.QuestionRepository;
 import java.util.List;
 
 public class QuizzViewModel extends ViewModel {
-
-    private QuestionRepository questionRepository;
+    private final QuestionRepository questionRepository;
     private List<Question> questions;
-    private Integer currentQuestionIndex = 0;
 
-    public QuizzViewModel(QuestionRepository questionRepository){
+    // LiveData qui contiendra la question courante
+    public MutableLiveData<Question> currentQuestion = new MutableLiveData<>();
+
+    public QuizzViewModel(QuestionRepository questionRepository) {
         this.questionRepository = questionRepository;
     }
 
-    MutableLiveData<Question> currentQuestion = new MutableLiveData<Question>();
-    MutableLiveData<Boolean> isLastQuestion = new MutableLiveData<Boolean>(false);
-
-    public void startQuizz(){
+    public void startQuizz() {
         questions = questionRepository.getQuestions();
-        currentQuestion.postValue(questions.get(0));
+        if (questions != null && !questions.isEmpty()) {
+            currentQuestion.postValue(questions.get(0));
+        }
     }
 
-    public void nextQuestion(){
-        Integer nextIndex = currentQuestionIndex + 1;
-        if(nextIndex >= questions.size()){
-            return;
-        } else if (nextIndex == questions.size() - 1){
-            isLastQuestion.postValue(true);
-        }
-        currentQuestionIndex = nextIndex;
-        currentQuestion.postValue(questions.get(nextIndex));
+    public List<Question> getQuestions() {
+        return questions;
     }
 }
