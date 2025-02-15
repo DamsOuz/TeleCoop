@@ -66,13 +66,13 @@ public class QuizzContentFragment extends Fragment {
 
         // Démarre le quiz et initialise la liste des questions
         viewModel.startQuizz();
+
+        // Récupère la liste des questions depuis le ViewModel
         questionOrder = new ArrayList<>(viewModel.getQuestions());
 
         // Restaure l'état sauvegardé (index courant et réponses sélectionnées)
         restoreQuizState();
 
-        // Récupère la liste des questions depuis le ViewModel
-        questionOrder = new ArrayList<>(viewModel.getQuestions());
         // Si un état sauvegardé existe, on utilise currentQuestionIndex sauvegardé (s'il est valide)
         if (currentQuestionIndex < questionOrder.size()) {
             viewModel.currentQuestion.postValue(questionOrder.get(currentQuestionIndex));
