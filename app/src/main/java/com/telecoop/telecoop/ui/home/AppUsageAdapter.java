@@ -94,9 +94,10 @@ public class AppUsageAdapter extends RecyclerView.Adapter<AppUsageAdapter.AppUsa
         // Retourne le temps d'utilisation formaté en minutes et secondes
         public String getUsageTimeText() {
             long totalSeconds = usageTime / 1000;
-            long minutes = totalSeconds / 60;
+            long heures = totalSeconds / 3600;
+            long minutes = (totalSeconds % 3600) / 60;
             long seconds = totalSeconds % 60;
-            return minutes + " min " + seconds + " s";
+            return heures + " h " + minutes + " min " + seconds + " s";
         }
 
         public int getUsagePercent() {
