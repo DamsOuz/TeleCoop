@@ -33,7 +33,7 @@
         <!-- Bouton Réponse 1 -->
         <Button
             android:id="@+id/answer1"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
             android:paddingHorizontal="32dp"
@@ -45,7 +45,7 @@
         <!-- Bouton Réponse 2 -->
         <Button
             android:id="@+id/answer2"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
             android:paddingHorizontal="32dp"
@@ -57,7 +57,7 @@
         <!-- Bouton Réponse 3 -->
         <Button
             android:id="@+id/answer3"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
             android:paddingHorizontal="32dp"
@@ -69,7 +69,7 @@
         <!-- Bouton Réponse 4 -->
         <Button
             android:id="@+id/answer4"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
             android:paddingHorizontal="32dp"
@@ -81,7 +81,7 @@
         <!-- Bouton Réponse 5 -->
         <Button
             android:id="@+id/answer5"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
             android:paddingHorizontal="32dp"
@@ -93,7 +93,7 @@
         <!-- Bouton Réponse 6 -->
         <Button
             android:id="@+id/answer6"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
             android:paddingHorizontal="32dp"
