@@ -94,7 +94,7 @@ public class QuizzContentFragment extends Fragment {
         binding.next.setEnabled(false);
 
         // Tableau des boutons de réponses (déclarés dans le layout)
-        Button[] answers = {binding.answer1, binding.answer2, binding.answer3, binding.answer4, binding.answer5};
+        Button[] answers = {binding.answer1, binding.answer2, binding.answer3, binding.answer4, binding.answer5, binding.answer6};
 
         // Observer la question courante pour mettre à jour l'interface
         viewModel.currentQuestion.observe(getViewLifecycleOwner(), question -> {
@@ -203,7 +203,7 @@ public class QuizzContentFragment extends Fragment {
 
     // Restaure l'apparence des boutons selon les réponses déjà sélectionnées
     private void restoreSelectedAnswers() {
-        Button[] answers = {binding.answer1, binding.answer2, binding.answer3, binding.answer4, binding.answer5};
+        Button[] answers = {binding.answer1, binding.answer2, binding.answer3, binding.answer4, binding.answer5, binding.answer6};
         Set<Integer> selectedIndices = selectedAnswersIndicesMap.get(currentQuestionIndex);
         if (selectedIndices != null) {
             for (Integer index : selectedIndices) {
