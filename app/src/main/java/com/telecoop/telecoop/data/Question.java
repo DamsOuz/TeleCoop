@@ -3,18 +3,18 @@ import java.util.List;
 
 public class Question {
     private final String question;
-    private final List<String> choiceList;
+    private final List<AnswerChoice> answerChoices;
 
-    public Question(String question, List<String> choiceList) {
+    public Question(String question, List<AnswerChoice> answerChoices) {
         this.question = question;
-        this.choiceList = choiceList;
+        this.answerChoices = answerChoices;
     }
 
     public String getQuestion() {
         return question;
     }
 
-    public List<String> getChoiceList() {
-        return choiceList;
+    public List<AnswerChoice> getAnswerChoices() {
+        return answerChoices;
     }
 }

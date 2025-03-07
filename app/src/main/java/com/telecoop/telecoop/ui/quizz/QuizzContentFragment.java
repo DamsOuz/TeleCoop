@@ -18,11 +18,14 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
+import android.util.Log;
 
 import com.telecoop.telecoop.R;
+import com.telecoop.telecoop.data.AnswerChoice;
+import com.telecoop.telecoop.data.Profile;
 import com.telecoop.telecoop.data.Question;
-import com.telecoop.telecoop.databinding.FragmentQuizzContentBinding;
 import com.telecoop.telecoop.injection.ViewModelFactory;
+import com.telecoop.telecoop.databinding.FragmentQuizzContentBinding;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,11 +40,12 @@ public class QuizzContentFragment extends Fragment {
     private FragmentQuizzContentBinding binding;
     private final int defaultColor = Color.WHITE;
     private final int selectedColor = Color.BLACK;
-    // Pour chaque question (identifiée par son indice dans la liste), on sauvegarde l'ensemble des indices de réponses sélectionnées
-    private Map<Integer, Set<Integer>> selectedAnswersIndicesMap = new HashMap<>();
+
+    // Pour chaque question, on enregistre l'ensemble des indices de réponses sélectionnées
+    private Map<Integer, Set<Integer>> selectedAnswerIndicesMap = new HashMap<>();
     // Liste des questions (issue du ViewModel)
-    private List<Question> questionOrder = new ArrayList<>();
-    // Index de la question courante (géré dans le fragment)
+    private ArrayList<Question> questionOrder = new ArrayList<>();
+    // Index de la question courante
     private int currentQuestionIndex = 0;
 
     public static QuizzContentFragment newInstance() {
@@ -64,28 +68,27 @@ public class QuizzContentFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Démarre le quiz et initialise la liste des questions
+        // Démarre le quiz et charge la liste de questions enrichies
         viewModel.startQuizz();
-
-        // Récupère la liste des questions depuis le ViewModel
         questionOrder = new ArrayList<>(viewModel.getQuestions());
 
-        // Restaure l'état sauvegardé (index courant et réponses sélectionnées)
+        // Restaure l'état sauvegardé (réponses sélectionnées et question courante)
         restoreQuizState();
 
-        // Si un état sauvegardé existe, on utilise currentQuestionIndex sauvegardé (s'il est valide)
+        // Réintégrer les scores à partir des réponses déjà sélectionnées
+        restoreProfileScores();
+
         if (currentQuestionIndex < questionOrder.size()) {
             viewModel.currentQuestion.postValue(questionOrder.get(currentQuestionIndex));
         } else {
             currentQuestionIndex = 0;
             viewModel.currentQuestion.postValue(questionOrder.get(0));
         }
-
         updateNextButtonText();
 
-        // Active le bouton "retour" de la barre d'action
-        if (getActivity() != null) {
-            ((androidx.appcompat.app.AppCompatActivity) getActivity())
+        // Active le bouton "retour" dans la barre d'action
+        if(getActivity() != null) {
+            ((androidx.appcompat.app.AppCompatActivity)getActivity())
                     .getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
         setHasOptionsMenu(true);
@@ -93,44 +96,49 @@ public class QuizzContentFragment extends Fragment {
         binding.next.setTextColor(Color.GRAY);
         binding.next.setEnabled(false);
 
-        // Tableau des boutons de réponses (déclarés dans le layout)
+        // Tableau des boutons de réponses (fixé à 6 maximum)
         Button[] answers = {binding.answer1, binding.answer2, binding.answer3, binding.answer4, binding.answer5, binding.answer6};
 
-        // Observer la question courante pour mettre à jour l'interface
+        // Observer la question courante pour mettre à jour l'affichage
         viewModel.currentQuestion.observe(getViewLifecycleOwner(), question -> {
-            if (question != null) {
+            if(question != null) {
                 updateQuestion(question);
             }
+
+            // Afficher l'état des scores dans la console
+            Log.d("ProfileScores", viewModel.getProfileScores().toString());
+
             // Réinitialise tous les boutons
-            for (Button button : answers) {
+            for(Button button : answers) {
                 button.setVisibility(View.GONE);
                 button.setOnClickListener(null);
                 button.setBackgroundTintList(android.content.res.ColorStateList.valueOf(defaultColor));
             }
-            if (question != null) {
-                // Affiche les choix de réponse
-                List<String> choices = question.getChoiceList();
-                for (int i = 0; i < choices.size(); i++) {
+            if(question != null) {
+                // On récupère la liste d'AnswerChoice
+                int nb = Math.min(question.getAnswerChoices().size(), answers.length);
+                for(int i = 0; i < nb; i++) {
                     int index = i;
-                    answers[i].setText(choices.get(i));
+                    AnswerChoice choice = question.getAnswerChoices().get(i);
+                    answers[i].setText(choice.getText());
                     answers[i].setVisibility(View.VISIBLE);
                     answers[i].setBackgroundTintList(android.content.res.ColorStateList.valueOf(defaultColor));
-                    answers[i].setOnClickListener(v -> updateAnswer(answers[index], index));
+                    answers[i].setOnClickListener(v -> {
+                        updateAnswer(answers[index], index, choice);
+                    });
                 }
             }
-            // Restaure la sélection déjà effectuée pour la question courante
             restoreSelectedAnswers();
             checkIfNextShouldBeEnabled();
         });
 
         // Gestion du clic sur le bouton "NEXT"/"FINISH"
         binding.next.setOnClickListener(v -> {
-            if (currentQuestionIndex < questionOrder.size() - 1) {
+            if(currentQuestionIndex < questionOrder.size() - 1) {
                 currentQuestionIndex++;
                 viewModel.currentQuestion.postValue(questionOrder.get(currentQuestionIndex));
                 updateNextButtonText();
             } else {
-                // Dernière question : on sauvegarde et on affiche le résultat
                 saveQuizState();
                 displayResultDialog();
             }
@@ -146,19 +154,18 @@ public class QuizzContentFragment extends Fragment {
         });
     }
 
-    // Gère la sélection d'un item du menu (ici, le bouton "retour" de l'action bar)
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
+        if(item.getItemId() == android.R.id.home) {
             handleBackNavigation();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    // Gère la navigation vers la question précédente ou la demande de confirmation pour quitter le quiz
+    // Navigation vers la question précédente ou confirmation de quitter le quiz
     private void handleBackNavigation() {
-        if (currentQuestionIndex > 0) {
+        if(currentQuestionIndex > 0) {
             currentQuestionIndex--;
             viewModel.currentQuestion.postValue(questionOrder.get(currentQuestionIndex));
             restoreSelectedAnswers();
@@ -177,65 +184,91 @@ public class QuizzContentFragment extends Fragment {
         }
     }
 
-    // Met à jour l'intitulé de la question dans l'interface
+    // Met à jour l'intitulé de la question affichée
     private void updateQuestion(Question question) {
         binding.question.setText(question.getQuestion());
         binding.next.setEnabled(false);
         binding.next.setTextColor(Color.GRAY);
     }
 
-    // Gère la sélection/désélection d'une réponse
-    private void updateAnswer(Button button, int answerIndex) {
-        Set<Integer> selectedSet = selectedAnswersIndicesMap.get(currentQuestionIndex);
-        if (selectedSet == null) {
+    /**
+     * Gère la sélection/désélection d'une réponse
+     * Permet de sélectionner plusieurs réponses par question
+     */
+    private void updateAnswer(Button button, int answerIndex, AnswerChoice choice) {
+        Set<Integer> selectedSet = selectedAnswerIndicesMap.get(currentQuestionIndex);
+        if(selectedSet == null) {
             selectedSet = new HashSet<>();
         }
-        if (selectedSet.contains(answerIndex)) {
+        if(selectedSet.contains(answerIndex)) {
+            // Désélectionner : retirer l'indice et décrémenter les profils associés
             selectedSet.remove(answerIndex);
             button.setBackgroundTintList(android.content.res.ColorStateList.valueOf(defaultColor));
+            viewModel.decrementProfiles(choice.getAssociatedProfiles());
         } else {
+            // Sélectionner : ajouter l'indice et incrémenter les profils associés
             selectedSet.add(answerIndex);
             button.setBackgroundTintList(android.content.res.ColorStateList.valueOf(selectedColor));
+            viewModel.incrementProfiles(choice.getAssociatedProfiles());
         }
-        selectedAnswersIndicesMap.put(currentQuestionIndex, selectedSet);
+        selectedAnswerIndicesMap.put(currentQuestionIndex, selectedSet);
         checkIfNextShouldBeEnabled();
     }
 
-    // Restaure l'apparence des boutons selon les réponses déjà sélectionnées
+    // Méthode utilitaire pour obtenir le bouton correspondant à un index
+    private Button getButtonForIndex(int index) {
+        Button[] answers = {binding.answer1, binding.answer2, binding.answer3, binding.answer4, binding.answer5, binding.answer6};
+        if(index >= 0 && index < answers.length) {
+            return answers[index];
+        }
+        return null;
+    }
+
+    // Méthode utilitaire pour restaurer l'apparence des boutons sélectionnés
     private void restoreSelectedAnswers() {
         Button[] answers = {binding.answer1, binding.answer2, binding.answer3, binding.answer4, binding.answer5, binding.answer6};
-        Set<Integer> selectedIndices = selectedAnswersIndicesMap.get(currentQuestionIndex);
-        if (selectedIndices != null) {
-            for (Integer index : selectedIndices) {
-                if (index >= 0 && index < answers.length) {
+        Set<Integer> selectedSet = selectedAnswerIndicesMap.get(currentQuestionIndex);
+        if(selectedSet != null) {
+            for (Integer index : selectedSet) {
+                if(index >= 0 && index < answers.length) {
                     answers[index].setBackgroundTintList(android.content.res.ColorStateList.valueOf(selectedColor));
                 }
             }
         }
     }
 
-    // Active/désactive le bouton NEXT en fonction d'une sélection
+    // Active ou désactive le bouton NEXT en fonction de si une réponse est sélectionnée
     private void checkIfNextShouldBeEnabled() {
-        Set<Integer> selectedSet = selectedAnswersIndicesMap.get(currentQuestionIndex);
-        boolean isAnySelected = selectedSet != null && !selectedSet.isEmpty();
+        Set<Integer> selectedSet = selectedAnswerIndicesMap.get(currentQuestionIndex);
+        boolean isAnySelected = (selectedSet != null && !selectedSet.isEmpty());
         binding.next.setEnabled(isAnySelected);
         binding.next.setTextColor(isAnySelected ? Color.WHITE : Color.GRAY);
     }
 
-    // Change le libellé du bouton selon que l'on est à la dernière question ou non
+    // Met à jour le texte du bouton NEXT ("NEXT" ou "FINISH")
     private void updateNextButtonText() {
-        if (currentQuestionIndex == questionOrder.size() - 1) {
+        if(currentQuestionIndex == questionOrder.size() - 1) {
             binding.next.setText("FINISH");
         } else {
             binding.next.setText("NEXT");
         }
     }
 
-    // Affiche une boîte de dialogue de résultat en fin de quiz
+    // Affiche un dialog avec les résultats du quiz (profils dominants, etc.)
     private void displayResultDialog() {
+        // Calculer et publier le résultat final dans le ViewModel
+        viewModel.computeFinalProfiles();
+
+        List<Profile> topProfiles = viewModel.getTopProfiles();
+
+        StringBuilder sb = new StringBuilder("Merci de ta participation ! Voici ton/tes profil(s) :\n");
+        for (Profile p : topProfiles) {
+            sb.append("- ").append(p.name()).append("\n");
+        }
+
         new AlertDialog.Builder(getActivity())
                 .setTitle("Terminé !")
-                .setMessage("Merci d'avoir répondu aux questions :)")
+                .setMessage(sb.toString())
                 .setPositiveButton("Quit", (dialog, id) -> {
                     NavController navController = NavHostFragment.findNavController(QuizzContentFragment.this);
                     navController.navigate(R.id.action_quizzContentFragment_to_homeFragment);
@@ -244,47 +277,71 @@ public class QuizzContentFragment extends Fragment {
                 .show();
     }
 
-    // Sauvegarde l'état (index courant et réponses sélectionnées) dans les SharedPreferences
+    // Sauvegarde l'état actuel du quiz (question et réponse sélectionnée) dans SharedPreferences
     private void saveQuizState() {
         SharedPreferences prefs = requireActivity().getSharedPreferences("QuizPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putInt("currentQuestionIndex", currentQuestionIndex);
-        for (Map.Entry<Integer, Set<Integer>> entry : selectedAnswersIndicesMap.entrySet()) {
+        for(Map.Entry<Integer, Set<Integer>> entry : selectedAnswerIndicesMap.entrySet()){
             int qIndex = entry.getKey();
             Set<Integer> answersSet = entry.getValue();
             StringBuilder sb = new StringBuilder();
-            for (Integer ansIndex : answersSet) {
+            for(Integer ansIndex : answersSet) {
                 sb.append(ansIndex).append(",");
             }
-            if (sb.length() > 0) {
-                sb.deleteCharAt(sb.length() - 1);
+            if(sb.length() > 0) {
+                sb.deleteCharAt(sb.length()-1);
             }
             editor.putString("question_" + qIndex, sb.toString());
         }
         editor.apply();
     }
 
-    // Restaure l'état sauvegardé depuis les SharedPreferences
+    // Restaure l'état du quiz depuis SharedPreferences
     private void restoreQuizState() {
         SharedPreferences prefs = requireActivity().getSharedPreferences("QuizPrefs", Context.MODE_PRIVATE);
         currentQuestionIndex = prefs.getInt("currentQuestionIndex", 0);
-        selectedAnswersIndicesMap.clear();
-
+        selectedAnswerIndicesMap.clear();
         int totalQuestions = questionOrder.size();
+        // Récupérer toutes les entrées pour éviter les problèmes de type
+        Map<String, ?> allPrefs = prefs.getAll();
         for (int i = 0; i < totalQuestions; i++) {
-            String key = "question_" + i;
-            String value = prefs.getString(key, "");
-            if (!value.isEmpty()) {
-                String[] parts = value.split(",");
-                Set<Integer> set = new HashSet<>();
-                for (String part : parts) {
-                    try {
-                        set.add(Integer.parseInt(part));
-                    } catch (NumberFormatException e) {
-                        e.printStackTrace();
-                    }
+            Object rawValue = allPrefs.get("question_" + i);
+            if (rawValue != null) {
+                String value;
+                if (rawValue instanceof String) {
+                    value = (String) rawValue;
+                } else {
+                    // Convertit en chaîne si ce n'est pas déjà une String
+                    value = String.valueOf(rawValue);
                 }
-                selectedAnswersIndicesMap.put(i, set);
+                if (!value.isEmpty()) {
+                    String[] parts = value.split(",");
+                    Set<Integer> set = new HashSet<>();
+                    for (String part : parts) {
+                        try {
+                            set.add(Integer.parseInt(part));
+                        } catch (NumberFormatException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    selectedAnswerIndicesMap.put(i, set);
+                }
+            }
+        }
+    }
+
+    /**
+     * Après avoir restauré les réponses sélectionnées, parcourt les réponses restaurées
+     * et incrémente les scores des profils correspondants dans le ViewModel
+     */
+    private void restoreProfileScores() {
+        for (Map.Entry<Integer, Set<Integer>> entry : selectedAnswerIndicesMap.entrySet()) {
+            int questionIndex = entry.getKey();
+            Set<Integer> answerSet = entry.getValue();
+            for (Integer answerIndex : answerSet) {
+                AnswerChoice choice = questionOrder.get(questionIndex).getAnswerChoices().get(answerIndex);
+                viewModel.incrementProfiles(choice.getAssociatedProfiles());
             }
         }
     }
