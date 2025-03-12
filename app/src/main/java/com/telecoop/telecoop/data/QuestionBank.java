@@ -30,10 +30,6 @@ public class QuestionBank {
                                         Arrays.asList(Profile.MANQUE_PRODUCTIVITE)
                                 ),
                                 new AnswerChoice(
-                                        "Je trouve que je manque de productivité",
-                                        Arrays.asList(Profile.MANQUE_PRODUCTIVITE)
-                                ),
-                                new AnswerChoice(
                                         "Je n'ai pas de problème à me concentrer",
                                         Arrays.asList(Profile.PROFIL_PAR_DEFAUT)
                                 ),
@@ -136,6 +132,54 @@ public class QuestionBank {
                                 new AnswerChoice(
                                         "J'ai l'impression de pas avoir été efficace / concentré.e",
                                         Arrays.asList(Profile.MANQUE_PRODUCTIVITE)
+                                )
+                        )),
+
+                new Question("Je trouve que je passe trop de temps sur mon téléphone à :",
+                        Arrays.asList(
+                                new AnswerChoice(
+                                        "Jouer à des jeux",
+                                        Arrays.asList(Profile.MANQUE_PRODUCTIVITE)
+                                ),
+                                new AnswerChoice(
+                                        "Scroller sur les réseaux",
+                                        Arrays.asList(Profile.DOOMSCROLL)
+                                ),
+                                new AnswerChoice(
+                                        "Surveiller mes notifications de discussion",
+                                        Arrays.asList(Profile.FOMO)
+                                ),
+                                new AnswerChoice(
+                                        "Regarder des vidéos",
+                                        Arrays.asList(Profile.MANQUE_PRODUCTIVITE)
+                                )
+                        )),
+
+                new Question("Parmi ces options, je souhaite me focaliser sur :",
+                        Arrays.asList(
+                                new AnswerChoice(
+                                        "Améliorer ma qualité de sommeil",
+                                        Arrays.asList(Profile.SOMMEIL)
+                                ),
+                                new AnswerChoice(
+                                        "Arrêter le doomscroll",
+                                        Arrays.asList(Profile.DOOMSCROLL)
+                                ),
+                                new AnswerChoice(
+                                        "Moins perdre de temps sur mon téléphone quand je m'ennuie",
+                                        Arrays.asList(Profile.PERTE_TEMPS_ENNUI)
+                                ),
+                                new AnswerChoice(
+                                        "Etre moins distrait.e",
+                                        Arrays.asList(Profile.MANQUE_PRODUCTIVITE)
+                                ),
+                                new AnswerChoice(
+                                        "Avoir moins d'anxiété de manquer des choses",
+                                        Arrays.asList(Profile.FOMO)
+                                ),
+                                new AnswerChoice(
+                                        "Me sentir plus connecté.e à moi-même",
+                                        Arrays.asList(Profile.AUTOMATISME)
                                 )
                         ))
         );
