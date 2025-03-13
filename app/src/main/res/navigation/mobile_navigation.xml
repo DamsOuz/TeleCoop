@@ -5,35 +5,48 @@
     android:id="@+id/mobile_navigation"
     app:startDestination="@+id/nav_home">
 
+    <!-- Page Home -->
     <fragment
         android:id="@+id/nav_home"
         android:name="com.telecoop.telecoop.ui.home.HomeFragment"
         android:label="@string/menu_home"
         tools:layout="@layout/fragment_home" />
 
+    <!-- Page Conseils -->
     <fragment
-        android:id="@+id/nav_gallery"
-        android:name="com.telecoop.telecoop.ui.gallery.GalleryFragment"
-        android:label="@string/menu_gallery"
-        tools:layout="@layout/fragment_gallery" />
+        android:id="@+id/nav_conseils"
+        android:name="com.telecoop.telecoop.ui.conseils.ConseilsFragment"
+        android:label="@string/menu_conseils"
+        tools:layout="@layout/fragment_conseils">
 
+        <action
+            android:id="@+id/action_nav_conseils_to_quizzWelcomeFragment"
+            app:destination="@id/nav_quizz"
+            app:popUpTo="@id/nav_conseils"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <!-- Page Quizz -->
     <fragment
         android:id="@+id/nav_quizz"
         android:name="com.telecoop.telecoop.ui.quizz.QuizzWelcomeFragment"
         android:label="@string/menu_quizz"
-        tools:layout="@layout/fragment_welcomequizz" />
+        tools:layout="@layout/fragment_welcomequizz">
+
+        <action
+            android:id="@+id/action_quizzWelcomeFragment_to_quizzContentFragment"
+            app:destination="@id/nav_quizz_content" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_quizz_content"
         android:name="com.telecoop.telecoop.ui.quizz.QuizzContentFragment"
         android:label="Quizz Content"
-        tools:layout="@layout/fragment_quizz_content" />
+        tools:layout="@layout/fragment_quizz_content">
 
-    <action
-        android:id="@+id/action_quizzWelcomeFragment_to_quizzContentFragment"
-        app:destination="@id/nav_quizz_content" />
+        <action
+            android:id="@+id/action_quizzContentFragment_to_homeFragment"
+            app:destination="@id/nav_quizz" />
+    </fragment>
 
-    <action
-        android:id="@+id/action_quizzContentFragment_to_homeFragment"
-        app:destination="@id/nav_quizz" />
 </navigation>

@@ -1,14 +1,14 @@
-package com.telecoop.telecoop.ui.gallery;
+package com.telecoop.telecoop.ui.conseils;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class GalleryViewModel extends ViewModel {
+public class ConseilsViewModel extends ViewModel {
 
     private final MutableLiveData<String> mText;
 
-    public GalleryViewModel() {
+    public ConseilsViewModel() {
         mText = new MutableLiveData<>();
         mText.setValue("This is gallery fragment");
     }
