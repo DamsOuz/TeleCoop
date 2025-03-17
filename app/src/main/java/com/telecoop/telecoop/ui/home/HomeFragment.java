@@ -44,6 +44,9 @@ public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
     private Handler usageStatsHandler;
+
+    // Stocke la progression cumulée par package depuis minuit
+    private Map<String, Long> currentUsageStats = new HashMap<>();
     private Runnable usageStatsRunnable;
     // Intervalle de rafraîchissement (1 seconde ici)
     private static final long REFRESH_INTERVAL = 1000;
@@ -152,6 +155,18 @@ public class HomeFragment extends Fragment {
             usageTimeMap.put(pkg, totalSoFar + duration);
         }
 
+        // Charger les statistiques cumulées avant que l'utilisateur quitte la page
+        Map<String, Long> persistedStats = loadPersistedUsageTimeMap();
+        for (Map.Entry<String, Long> entry : persistedStats.entrySet()) {
+            String pkg = entry.getKey();
+            long persistedTime = entry.getValue();
+            long currentTime = usageTimeMap.getOrDefault(pkg, 0L);
+            usageTimeMap.put(pkg, currentTime + persistedTime);
+        }
+
+        // On stocke la map cumulée pour la sauvegarde ultérieure
+        currentUsageStats = usageTimeMap;
+
         // Convertit usageTimeMap en liste d'AppUsageInfo
         List<AppUsageAdapter.AppUsageInfo> usageInfos = new ArrayList<>();
         PackageManager pm = requireContext().getPackageManager();
@@ -200,6 +215,40 @@ public class HomeFragment extends Fragment {
         recyclerView.setAdapter(adapter);
     }
 
+    // Sauvegarde currentUsageStats dans SharedPreferences
+    private void saveUsageTimeMap(Map<String, Long> usageTimeMap) {
+        SharedPreferences prefs = requireContext().getSharedPreferences("UsageStatsPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        // Supprime d'anciennes entrées commençant par "usage_"
+        for (String key : prefs.getAll().keySet()) {
+            if (key.startsWith("usage_")) {
+                editor.remove(key);
+            }
+        }
+        // Sauvegarde chaque valeur avec la clé "usage_<package>"
+        for (Map.Entry<String, Long> entry : usageTimeMap.entrySet()) {
+            editor.putLong("usage_" + entry.getKey(), entry.getValue());
+        }
+        editor.apply();
+    }
+
+    // Charge la map d'usage persistée depuis SharedPreferences
+    private Map<String, Long> loadPersistedUsageTimeMap() {
+        SharedPreferences prefs = requireContext().getSharedPreferences("UsageStatsPrefs", Context.MODE_PRIVATE);
+        Map<String, ?> allEntries = prefs.getAll();
+        Map<String, Long> map = new HashMap<>();
+        for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
+            String key = entry.getKey();
+            if (key.startsWith("usage_") && entry.getValue() instanceof Long) {
+                // On enlève le préfixe "usage_" pour retrouver le nom du package
+                String packageName = key.substring("usage_".length());
+                map.put(packageName, (Long) entry.getValue());
+            }
+        }
+        return map;
+    }
+
     // Vérifie la permission, la demande si nécessaire, et lance le rafraîchissement
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -237,5 +286,7 @@ public class HomeFragment extends Fragment {
         if (usageStatsHandler != null && usageStatsRunnable != null) {
             usageStatsHandler.removeCallbacks(usageStatsRunnable);
         }
+        // Conserver le temps d'utilisation de chaque app depuis minuit
+        saveUsageTimeMap(currentUsageStats);
     }
 }
