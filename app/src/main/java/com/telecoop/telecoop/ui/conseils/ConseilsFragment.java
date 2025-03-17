@@ -45,9 +45,9 @@ public class ConseilsFragment extends Fragment {
 
         // Exemples de boutons : "Temps positifs", "Gestion des objectifs", ...
         binding.btnTempsPositifs.setOnClickListener(v -> {
-            // Récupérer le tutoriel "filtres_couleurs" depuis le provider
-            Content temps_positifs = com.telecoop.telecoop.data.ContentProvider.getContent("temps_positifs");
-            showOverlay(temps_positifs.getTitle(), temps_positifs.getContent(), temps_positifs.getImageResId());
+            // Navigation vers l'écran d'accueil du quizz (QuizzWelcomeFragment)
+            NavController navController = NavHostFragment.findNavController(this);
+            navController.navigate(R.id.action_nav_conseils_to_tempspositifs);
         });
 
         binding.btnGestionObjectifs.setOnClickListener(v -> {

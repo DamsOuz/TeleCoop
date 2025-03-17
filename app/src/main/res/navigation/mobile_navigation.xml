@@ -24,7 +24,20 @@
             app:destination="@id/nav_quizz"
             app:popUpTo="@id/nav_conseils"
             app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_nav_conseils_to_tempspositifs"
+            app:destination="@id/nav_temps_positifs"
+            app:popUpTo="@id/nav_conseils"
+            app:popUpToInclusive="true" />
     </fragment>
+
+    <!-- Page Temps Positifs -->
+    <fragment
+        android:id="@+id/nav_temps_positifs"
+        android:name="com.telecoop.telecoop.ui.tempspositifs.TempsPositifsFragment"
+        android:label="@string/menu_temps_positifs"
+        tools:layout="@layout/fragment_temps_positifs" />
 
     <!-- Page Quizz -->
     <fragment

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root_temps_positifs"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Conteneur principal avec alignement centré horizontalement -->
+    <LinearLayout
+        android:id="@+id/mainContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:gravity="center_horizontal">
+
+        <!-- Bouton "Ajouter un temps positif" -->
+        <Button
+            android:id="@+id/btnAddTempsPositif"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ajouter un temps positif"
+            android:textSize="30sp"
+            android:padding="12dp"
+            android:backgroundTint="#74d0f1"
+            android:layout_marginTop="16dp"/>
+
+        <!-- Titre "Mes temps positifs" centré -->
+        <TextView
+            android:id="@+id/txtMesTempsPositifs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mes temps positifs"
+            android:textSize="35sp"
+            android:textStyle="bold"
+            android:layout_marginTop="45dp"/>
+
+        <!-- Liste des temps positifs -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerTempsPositifs"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="25dp"/>
+    </LinearLayout>
+
+    <!-- Overlay d'ajout -->
+    <LinearLayout
+        android:id="@+id/overlayAddContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="#AA000000"
+        android:visibility="gone"
+        android:gravity="center">
+
+        <LinearLayout
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:padding="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ajouter un temps positif"
+                android:textStyle="bold"
+                android:textSize="18sp"/>
+
+            <EditText
+                android:id="@+id/edtTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Intitulé du temps positif"
+                android:layout_marginTop="12dp"/>
+
+            <EditText
+                android:id="@+id/edtDuration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Durée (en minutes)"
+                android:inputType="number"
+                android:layout_marginTop="8dp"/>
+
+            <Button
+                android:id="@+id/btnSaveTempsPositif"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Enregistrer"
+                android:layout_marginTop="16dp"/>
+
+            <Button
+                android:id="@+id/btnCancelAdd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Annuler"
+                android:layout_marginTop="4dp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Overlay de détail -->
+    <LinearLayout
+        android:id="@+id/overlayDetailContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="#AA000000"
+        android:visibility="gone"
+        android:gravity="center">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:padding="16dp"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/txtDetailTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Titre du temps positif"
+                android:textStyle="bold"
+                android:textSize="18sp"/>
+
+            <!-- Camembert -->
+            <ProgressBar
+                android:id="@+id/progressCamembert"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:indeterminateOnly="false"
+                android:max="100"
+                android:progress="0"
+                android:layout_marginTop="16dp"
+                android:progressDrawable="@drawable/circle_progress_drawable" />
+
+            <TextView
+                android:id="@+id/txtTimeRemaining"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00:00"
+                android:textSize="20sp"
+                android:layout_marginTop="8dp"/>
+
+            <Button
+                android:id="@+id/btnPlayPause"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Play"
+                android:layout_marginTop="16dp"/>
+
+            <Button
+                android:id="@+id/btnCloseDetail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Fermer"
+                android:layout_marginTop="8dp"/>
+
+            <Button
+                android:id="@+id/btnDeleteTemps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Supprimer"
+                android:layout_marginTop="8dp"/>
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

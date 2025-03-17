@@ -1,0 +1,36 @@
+<!-- Rotation de 3pi/2 pour avoir le timer qui commence en haut et pas à droite -->
+<rotate
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fromDegrees="270"
+    android:toDegrees="270"
+    android:pivotX="50%"
+    android:pivotY="50%">
+
+    <layer-list>
+            <!-- Fond gris pour la partie non remplie -->
+            <item android:id="@android:id/background">
+                <shape
+                    android:innerRadius="0dp"
+                    android:shape="ring"
+                    android:thicknessRatio="2"
+                    android:useLevel="false">
+                    <solid android:color="@android:color/darker_gray" />
+                </shape>
+            </item>
+
+            <!-- Couleur de la progression (orange) -->
+            <item android:id="@android:id/progress">
+                <shape
+                    android:innerRadius="0dp"
+                    android:shape="ring"
+                    android:thicknessRatio="2"
+                    android:useLevel="true">
+                    <gradient
+                        android:startColor="@android:color/holo_orange_light"
+                        android:centerColor="@android:color/holo_orange_dark"
+                        android:endColor="@android:color/holo_orange_light"
+                        android:angle="0"/>
+                </shape>
+            </item>
+        </layer-list>
+</rotate>
