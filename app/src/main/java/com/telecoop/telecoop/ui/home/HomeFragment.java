@@ -13,9 +13,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -32,9 +35,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.text.SimpleDateFormat;
 
 /**
  * HomeFragment utilisant UsageEvents pour un suivi plus "en temps réel"
@@ -50,6 +55,8 @@ public class HomeFragment extends Fragment {
     private Runnable usageStatsRunnable;
     // Intervalle de rafraîchissement (1 seconde ici)
     private static final long REFRESH_INTERVAL = 1000;
+    // Timestamp du début de la session en cours (lorsque l'app est active)
+    private long sessionStartTime = 0;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -60,9 +67,6 @@ public class HomeFragment extends Fragment {
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
-        // Masque le texte par défaut ("this is home fragment")
-        //binding.textHome.setVisibility(View.GONE);
 
         return root;
     }
@@ -100,7 +104,10 @@ public class HomeFragment extends Fragment {
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
-        long startTime = calendar.getTimeInMillis();
+        long midnight = calendar.getTimeInMillis();
+
+        // Utiliser le plus grand entre minuit et sessionStartTime
+        long startTime = Math.max(midnight, sessionStartTime);
         long endTime = System.currentTimeMillis();
 
         // Récupère tous les événements UsageEvents (MOVE_TO_FOREGROUND, MOVE_TO_BACKGROUND, etc.)
@@ -209,9 +216,14 @@ public class HomeFragment extends Fragment {
 
     // Affiche la liste dans le RecyclerView
     private void showUsageInRecyclerView(List<AppUsageAdapter.AppUsageInfo> usageInfos) {
-        RecyclerView recyclerView = requireView().findViewById(R.id.recyclerViewUsage);
+        RecyclerView recyclerView = binding.recyclerViewUsage;
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        AppUsageAdapter adapter = new AppUsageAdapter(usageInfos);
+        AppUsageAdapter adapter = new AppUsageAdapter(usageInfos, new AppUsageAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(AppUsageAdapter.AppUsageInfo usageInfo, int position) {
+                openFeedbackOverlay(usageInfo);
+            }
+        });
         recyclerView.setAdapter(adapter);
     }
 
@@ -249,24 +261,157 @@ public class HomeFragment extends Fragment {
         return map;
     }
 
+    // Méthode pour ouvrir l'overlay de feedback pour une application cliquée
+    private void openFeedbackOverlay(AppUsageAdapter.AppUsageInfo usageInfo) {
+        // Récupérer l'overlay inclus dans fragment_home.xml
+        View feedbackOverlay = requireView().findViewById(R.id.feedbackOverlay);
+        feedbackOverlay.setVisibility(View.VISIBLE);
+
+        // Récupérer les vues dans l'overlay
+        TextView tvFeedbackQuestion = feedbackOverlay.findViewById(R.id.tvFeedbackQuestion);
+        TextView tvFeedbackReasonPrompt = feedbackOverlay.findViewById(R.id.tvFeedbackReasonPrompt);
+        RatingBar ratingBarFeedback = feedbackOverlay.findViewById(R.id.ratingBarFeedback);
+        Button btnCloseFeedback = feedbackOverlay.findViewById(R.id.btnCloseFeedback);
+
+        // Récupérer les boutons de raison
+        Button btnReasonTravail = feedbackOverlay.findViewById(R.id.btnReasonTravail);
+        Button btnReasonDivertissement = feedbackOverlay.findViewById(R.id.btnReasonDivertissement);
+        Button btnReasonCommuniquer = feedbackOverlay.findViewById(R.id.btnReasonCommuniquer);
+        Button btnReasonApprendre = feedbackOverlay.findViewById(R.id.btnReasonApprendre);
+        Button btnReasonOrganisation = feedbackOverlay.findViewById(R.id.btnReasonOrganisation);
+        Button btnReasonActiviteCreative = feedbackOverlay.findViewById(R.id.btnReasonActiviteCreative);
+
+        // Obtenir le nom de l'application depuis l'item cliqué
+        String appName = usageInfo.getAppName();
+
+        // Mettre à jour le texte en insérant le nom de l'application
+        tvFeedbackQuestion.setText("Qu'avez-vous ressenti en utilisant " + appName + " aujourd'hui ?");
+        tvFeedbackReasonPrompt.setText("Pourquoi avez-vous utilisé " + appName + " aujourd'hui ?");
+
+        // Utiliser la date actuelle (formatée) pour indexer le feedback
+        String currentDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+
+        // Utiliser SharedPreferences pour stocker la note pour cette app et ce jour
+        SharedPreferences prefsFeedback = requireContext().getSharedPreferences("FeedbackPrefs", Context.MODE_PRIVATE);
+        String key = "feedback_" + appName + "_" + currentDate;
+
+        // Lire la note enregistrée en utilisant -1.0 comme valeur sentinelle
+        float savedRating = prefsFeedback.getFloat(key, -1f);
+        if (savedRating == -1f) {
+            // Aucune note enregistrée, on fixe la valeur par défaut (3 étoiles)
+            savedRating = 3f;
+            prefsFeedback.edit().putFloat(key, savedRating).apply();
+        }
+
+        Log.d("FeedbackLog", "Initial rating for " + appName + " on " + currentDate + ": " + savedRating);
+        ratingBarFeedback.setRating(savedRating);
+
+        // Variable finale pour l'utiliser dans l'inner class
+        final float initialRating = savedRating;
+
+        // Lorsque l'utilisateur change la note, on la sauvegarde
+        ratingBarFeedback.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                if (fromUser) {
+                    prefsFeedback.edit().putFloat(key, rating).apply();
+                    Log.d("FeedbackLog", "Initial rating for " + appName + " on " + currentDate + ": " + rating);
+                }
+            }
+        });
+
+        btnCloseFeedback.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                feedbackOverlay.setVisibility(View.GONE);
+                float finalRating = prefsFeedback.getFloat(key, initialRating);
+                Log.d("FeedbackLog", "Final rating for " + appName + " on " + currentDate + ": " + finalRating);
+            }
+        });
+
+        // Configurer les boutons toggle pour les raisons
+        setupToggleButton(btnReasonTravail, appName, currentDate, "travail");
+        setupToggleButton(btnReasonDivertissement, appName, currentDate, "divertissement");
+        setupToggleButton(btnReasonCommuniquer, appName, currentDate, "communiquer");
+        setupToggleButton(btnReasonApprendre, appName, currentDate, "apprendre");
+        setupToggleButton(btnReasonOrganisation, appName, currentDate, "organisation");
+        setupToggleButton(btnReasonActiviteCreative, appName, currentDate, "activite_creative");
+    }
+
+    private void updateButtonAppearance(Button button, boolean isActive) {
+        if (isActive) {
+            // Apparence active
+            button.setBackgroundColor(getResources().getColor(R.color.active_button_color));
+            button.setTextColor(getResources().getColor(android.R.color.white));
+        } else {
+            // Apparence inactive (grisée)
+            button.setBackgroundColor(getResources().getColor(R.color.inactive_button_color));
+            button.setTextColor(getResources().getColor(android.R.color.black));
+        }
+    }
+
+    private void setupToggleButton(final Button button, final String appName, final String currentDate, final String reason) {
+        final String key = "reason_" + appName + "_" + currentDate + "_" + reason;
+        final SharedPreferences prefsToggle = requireContext().getSharedPreferences("FeedbackPrefs", Context.MODE_PRIVATE);
+        // Charger l'état sauvegardé, par défaut false (inactif)
+        boolean isActive = prefsToggle.getBoolean(key, false);
+        updateButtonAppearance(button, isActive);
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean currentState = prefsToggle.getBoolean(key, false);
+                boolean newState = !currentState;
+                prefsToggle.edit().putBoolean(key, newState).apply();
+                updateButtonAppearance(button, newState);
+                Log.d("FeedbackLog", "Reason " + reason + " for " + appName + " on " + currentDate + " set to " + newState);
+            }
+        });
+    }
+
+    // Verifier et reinitialiser les données de la journée
+    private void checkAndResetUsageStatsForNewDay() {
+        SharedPreferences prefs = requireContext().getSharedPreferences("UsageStatsPrefs", Context.MODE_PRIVATE);
+        String today = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        // Utilise null comme valeur par défaut pour différencier "non défini"
+        String lastDate = prefs.getString("usage_lastDate", null);
+
+        if (lastDate == null) {
+            // Première ouverture du jour : ne réinitialise rien, juste stocke la date d'aujourd'hui
+            prefs.edit().putString("usage_lastDate", today).apply();
+            Log.d("UsageStats", "First launch today, set usage_lastDate to " + today);
+        } else if (!today.equals(lastDate)) {
+            // La journée a changé : réinitialiser les statistiques
+            SharedPreferences.Editor editor = prefs.edit();
+            for (String key : prefs.getAll().keySet()) {
+                if (key.startsWith("usage_") && !key.equals("usage_lastDate")) {
+                    editor.remove(key);
+                }
+            }
+            // Mettre à jour la date enregistrée avec la date d'aujourd'hui
+            editor.putString("usage_lastDate", today);
+            editor.apply();
+            Log.d("UsageStats", "Usage stats reset for new day: " + today);
+        } else {
+            Log.d("UsageStats", "Same day (" + today + "), no reset needed.");
+        }
+    }
+
+
     // Vérifie la permission, la demande si nécessaire, et lance le rafraîchissement
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        SharedPreferences prefs = requireContext().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
-        boolean permissionAsked = prefs.getBoolean("usageStatsPermissionAsked", false);
+        // Vérifie si c'est un nouveau jour et réinitialise les stats si nécessaire
+        checkAndResetUsageStatsForNewDay();
 
-        if (!hasUsageStatsPermission(requireContext())) {
-            if (!permissionAsked) {
-                requestUsageStatsPermission();
-                prefs.edit().putBoolean("usageStatsPermissionAsked", true).apply();
-            }
-        } else {
-            loadUsageStats();
+        // Initialiser sessionStartTime une seule fois
+        if (sessionStartTime == 0) {
+            sessionStartTime = System.currentTimeMillis();
         }
 
-        // Rafraîchissement "en temps réel" (toutes les 1 seconde)
+        // Configurer le handler pour rafraîchir les statistiques toutes les 1 seconde
         usageStatsHandler = new Handler(Looper.getMainLooper());
         usageStatsRunnable = new Runnable() {
             @Override
@@ -286,7 +431,25 @@ public class HomeFragment extends Fragment {
         if (usageStatsHandler != null && usageStatsRunnable != null) {
             usageStatsHandler.removeCallbacks(usageStatsRunnable);
         }
+        // Sauvegarder le temps de pause pour ne pas compter la période inactive
+        SharedPreferences prefsUsage = requireContext().getSharedPreferences("UsageStatsPrefs", Context.MODE_PRIVATE);
+        prefsUsage.edit().putLong("lastActiveTime", System.currentTimeMillis()).apply();
         // Conserver le temps d'utilisation de chaque app depuis minuit
         saveUsageTimeMap(currentUsageStats);
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Récupérer la dernière heure d'activité sauvegardée (si présente)
+        SharedPreferences prefs = requireContext().getSharedPreferences("UsageStatsPrefs", Context.MODE_PRIVATE);
+        sessionStartTime = prefs.getLong("lastActiveTime", 0);
+        if (sessionStartTime == 0) {
+            // Première ouverture de la session : démarre à l'instant présent
+            sessionStartTime = System.currentTimeMillis();
+        }
+        // Relancer le rafraîchissement des stats
+        usageStatsHandler.post(usageStatsRunnable);
+    }
+
 }

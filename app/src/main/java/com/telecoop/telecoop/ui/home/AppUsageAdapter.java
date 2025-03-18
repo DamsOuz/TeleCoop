@@ -18,9 +18,12 @@ import java.util.List;
 public class AppUsageAdapter extends RecyclerView.Adapter<AppUsageAdapter.AppUsageViewHolder> {
 
     private List<AppUsageInfo> usageList;
+    private OnItemClickListener listener;
 
-    public AppUsageAdapter(List<AppUsageInfo> usageList) {
+    // Constructeur incluant le listener pour les clics
+    public AppUsageAdapter(List<AppUsageInfo> usageList, OnItemClickListener listener) {
         this.usageList = usageList;
+        this.listener = listener;
     }
 
     @NonNull
@@ -43,6 +46,17 @@ public class AppUsageAdapter extends RecyclerView.Adapter<AppUsageAdapter.AppUsa
         holder.appUsageBar.setProgress(info.getUsagePercent());
         // Icône de l'appli
         holder.appIcon.setImageDrawable(info.getAppIcon());
+
+        // Utiliser holder.getAdapterPosition() au clic
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int currentPosition = holder.getAdapterPosition();
+                if (currentPosition != RecyclerView.NO_POSITION && listener != null) {
+                    listener.onItemClick(usageList.get(currentPosition), currentPosition);
+                }
+            }
+        });
     }
 
     @Override
@@ -63,6 +77,11 @@ public class AppUsageAdapter extends RecyclerView.Adapter<AppUsageAdapter.AppUsa
             appUsageTime = itemView.findViewById(R.id.appUsageTime);
             appUsageBar = itemView.findViewById(R.id.appUsageBar);
         }
+    }
+
+    // Interface pour gérer le clic sur un item
+    public interface OnItemClickListener {
+        void onItemClick(AppUsageInfo usageInfo, int position);
     }
 
     // Classe représentant les informations d'utilisation d'une application
@@ -91,7 +110,7 @@ public class AppUsageAdapter extends RecyclerView.Adapter<AppUsageAdapter.AppUsa
             return usageTime;
         }
 
-        // Retourne le temps d'utilisation formaté en minutes et secondes
+        // Retourne le temps d'utilisation formaté en heures, minutes et secondes
         public String getUsageTimeText() {
             long totalSeconds = usageTime / 1000;
             long heures = totalSeconds / 3600;
