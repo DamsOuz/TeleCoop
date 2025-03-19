@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Titre (nom de l'appli) -->
+        <TextView
+            android:id="@+id/txtAppTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Titre de l'appli"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Sélection de l'échelle de temps (jour/semaine/mois) -->
+        <Spinner
+            android:id="@+id/spinnerScale"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:entries="@array/scale_options"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Vue personnalisée pour le graphique -->
+        <com.telecoop.telecoop.ui.dashboard.SimpleBarChartView
+            android:id="@+id/simpleBarChartView"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Conteneur pour la légende -->
+        <LinearLayout
+            android:id="@+id/legendContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="16dp">
+
+            <!-- Vue pour la ligne pointillée -->
+            <View
+                android:id="@+id/dashedLine"
+                android:layout_width="30dp"
+                android:layout_height="4dp"
+                android:background="@drawable/dashed_line" />
+
+            <!-- TextView pour afficher la moyenne -->
+            <TextView
+                android:id="@+id/txtLegend"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=": 0.0h"
+                android:textSize="16sp"
+                android:layout_marginStart="8dp" />
+        </LinearLayout>
+
+        <!-- Texte "Cette semaine, vous avez utilisé..." -->
+        <TextView
+            android:id="@+id/txtUsageReasons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:text="Cette semaine, vous avez utilisé ??? pour :"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Boutons de raisons -->
+        <LinearLayout
+            android:id="@+id/llReasons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnReason1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Raison 1"
+                android:layout_marginRight="8dp"/>
+
+            <Button
+                android:id="@+id/btnReason2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Raison 2"/>
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

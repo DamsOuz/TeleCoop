@@ -62,4 +62,10 @@
             app:destination="@id/nav_quizz" />
     </fragment>
 
+    <fragment
+        android:id="@+id/nav_dashboard"
+        android:name="com.telecoop.telecoop.ui.dashboard.DashboardFragment"
+        android:label="@string/menu_dashboard"
+        tools:layout="@layout/fragment_dashboard" />
+
 </navigation>

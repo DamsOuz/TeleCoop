@@ -11,6 +11,7 @@
     <string name="menu_conseils">Conseils</string>
     <string name="menu_temps_positifs">Temps positifs</string>
     <string name="menu_quizz">Quizz</string>
+    <string name="menu_dashboard">Tableau de bord</string>
 
     <string name="app_icon_desc">Icone de l\'application</string>
     <!-- TODO: Remove or change this placeholder text -->

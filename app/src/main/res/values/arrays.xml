@@ -1,0 +1,7 @@
+<resources>
+    <string-array name="scale_options">
+        <item>Jours de la semaine</item>
+        <item>Semaines du mois</item>
+        <item>Mois de l\'année</item>
+    </string-array>
+</resources>

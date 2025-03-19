@@ -1,0 +1,16 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="line">
+
+    <!-- Fond transparent, pour être sûr qu'on voit la ligne -->
+    <solid android:color="@android:color/transparent"/>
+
+    <!-- Hauteur du trait (on peut l'augmenter pour tester) -->
+    <size android:height="2dp" />
+
+    <!-- Définition du trait pointillé -->
+    <stroke
+        android:width="2dp"
+        android:color="#FF0000"
+    android:dashWidth="10dp"
+    android:dashGap="5dp" />
+</shape>
