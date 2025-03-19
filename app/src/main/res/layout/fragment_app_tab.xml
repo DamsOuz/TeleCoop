@@ -20,13 +20,62 @@
             android:textStyle="bold"
             android:layout_marginBottom="16dp"/>
 
-        <!-- Sélection de l'échelle de temps (jour/semaine/mois) -->
-        <Spinner
-            android:id="@+id/spinnerScale"
-            android:layout_width="wrap_content"
+        <!-- Titre du graphique -->
+        <TextView
+            android:id="@+id/txtChartTitle"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:entries="@array/scale_options"
-            android:layout_marginBottom="16dp"/>
+            android:text="Temps d'utilisation de l'application"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="20dp" />
+
+        <!-- Barre horizontale contenant le Spinner et les flèches -->
+        <LinearLayout
+            android:id="@+id/scaleAndArrowsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+
+            <!-- Sélection de l'échelle de temps (jour/semaine/mois) -->
+            <Spinner
+                android:id="@+id/spinnerScale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:entries="@array/scale_options"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- Espace flexible pour pousser les flèches à droite -->
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <!-- Bouton flèche gauche -->
+            <!-- Flèche gauche -->
+            <ImageView
+                android:id="@+id/ivPrev"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_arrow_left"
+                android:padding="8dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <!-- Flèche droite -->
+            <ImageView
+                android:id="@+id/ivNext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_arrow_right"
+                android:padding="8dp"
+                android:clickable="true"
+                android:focusable="true" />
+        </LinearLayout>
 
         <!-- Vue personnalisée pour le graphique -->
         <com.telecoop.telecoop.ui.dashboard.SimpleBarChartView

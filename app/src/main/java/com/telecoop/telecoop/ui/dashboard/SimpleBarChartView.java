@@ -8,29 +8,19 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
-
 import androidx.annotation.Nullable;
-
-import java.util.Arrays;
 import java.util.List;
 
-/**
- * Un simple diagramme en barres pour 7 jours, avec :
- * - Barres arrondies
- * - Ligne horizontale pointillée pour la moyenne
- * - Graduation de l'axe Y
- * - Indication de la valeur moyenne
- */
 public class SimpleBarChartView extends View {
 
-    private List<Float> dataPoints;    // 7 valeurs, ex : [2.0, 3.5, 1.0, 4.0, 5.0, 2.5, 3.0]
-    private String[] dayLabels = {"L", "M", "M", "J", "V", "S", "D"};
+    private List<Float> dataPoints; // Liste de valeurs (peut être 7, 4, 12 etc...)
+    private String[] xLabels; // Labels pour l'axe X (de même taille que dataPoints)
 
     private Paint barPaint;
     private Paint axisPaint;
     private Paint textPaint;
     private Paint avgLinePaint;
-    private Paint dottedLinePaint;  // Pour dessiner les lignes horizontales de graduation
+    private Paint dottedLinePaint; // Pour dessiner les graduations
 
     public SimpleBarChartView(Context context) {
         super(context);
@@ -48,28 +38,23 @@ public class SimpleBarChartView extends View {
     }
 
     private void init() {
-        // Peinture pour les barres
         barPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         barPaint.setColor(Color.BLUE);
 
-        // Peinture pour les axes
         axisPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         axisPaint.setColor(Color.BLACK);
         axisPaint.setStrokeWidth(2f);
 
-        // Peinture pour le texte
         textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         textPaint.setColor(Color.BLACK);
         textPaint.setTextSize(30f);
 
-        // Peinture pour la ligne moyenne (pointillée)
         avgLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         avgLinePaint.setColor(Color.RED);
         avgLinePaint.setStrokeWidth(3f);
         avgLinePaint.setStyle(Paint.Style.STROKE);
         avgLinePaint.setPathEffect(new DashPathEffect(new float[]{10,10}, 0));
 
-        // Peinture pour les lignes de graduation (pointillées)
         dottedLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         dottedLinePaint.setColor(Color.GRAY);
         dottedLinePaint.setStrokeWidth(1.5f);
@@ -77,26 +62,29 @@ public class SimpleBarChartView extends View {
         dottedLinePaint.setPathEffect(new DashPathEffect(new float[]{5,5}, 0));
     }
 
+    // Accepte n'importe quel nombre de points (doit être non vide)
     public void setDataPoints(List<Float> dataPoints) {
-        if (dataPoints.size() != 7) {
-            throw new IllegalArgumentException("Il faut exactement 7 valeurs (une par jour).");
+        if (dataPoints == null || dataPoints.isEmpty()) {
+            throw new IllegalArgumentException("La liste de données ne peut être vide.");
         }
         this.dataPoints = dataPoints;
         invalidate();
     }
 
-    public void setDayLabels(String[] labels) {
-        if (labels.length != 7) {
-            throw new IllegalArgumentException("Il faut 7 labels pour 7 jours.");
+    // Accepte un tableau de labels (doit avoir la même longueur que dataPoints)
+    public void setXLabels(String[] labels) {
+        if (labels == null || labels.length == 0) {
+            throw new IllegalArgumentException("Les labels ne peuvent être vides.");
         }
-        this.dayLabels = labels;
+        this.xLabels = labels;
         invalidate();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if (dataPoints == null || dataPoints.isEmpty()) return;
+        if (dataPoints == null || dataPoints.isEmpty() || xLabels == null || xLabels.length != dataPoints.size())
+            return;
 
         float width = getWidth();
         float height = getHeight();
@@ -110,60 +98,60 @@ public class SimpleBarChartView extends View {
         float chartWidth = width - marginLeft - marginRight;
         float chartHeight = height - marginTop - marginBottom;
 
-        // Dessiner l'axe X
+        // Axe X
         float axisX_Y = height - marginBottom;
         canvas.drawLine(marginLeft, axisX_Y, width - marginRight, axisX_Y, axisPaint);
 
-        // Dessiner l'axe Y
-        float axisY_X = marginLeft;
-        canvas.drawLine(axisY_X, marginTop, axisY_X, axisX_Y, axisPaint);
+        // Axe Y
+        canvas.drawLine(marginLeft, marginTop, marginLeft, axisX_Y, axisPaint);
 
-        // Trouver la valeur max
+        // Calcul du max
         float maxValue = 0f;
         for (float v : dataPoints) {
             if (v > maxValue) maxValue = v;
         }
         if (maxValue == 0f) maxValue = 1f;
 
-        // Calculer la moyenne
-        float sum = 0f;
+        // Calcul de la moyenne en ignorant les points à 0
+        float sumNonZero = 0f;
+        int countNonZero = 0;
         for (float v : dataPoints) {
-            sum += v;
+            if (v > 0) {
+                sumNonZero += v;
+                countNonZero++;
+            }
         }
-        float avg = sum / dataPoints.size();  // moyenne
+        float avgNonZero = 0f;
+        if (countNonZero > 0) {
+            avgNonZero = sumNonZero / countNonZero;
+        }
 
-        // Dessiner la ligne moyenne (pointillée)
-        float avgRatio = avg / maxValue;
+        // Ligne moyenne pointillée
+        float avgRatio = avgNonZero / maxValue;
         float avgY = axisX_Y - (avgRatio * chartHeight);
         canvas.drawLine(marginLeft, avgY, width - marginRight, avgY, avgLinePaint);
 
-        // Dessiner une échelle Y (graduations)
-        // Par exemple, on fait un step = 1 (ou ajuster si maxValue > 5)
+        // Graduation de l'axe Y (avec step = 1)
         int step = 1;
         if (maxValue > 5) {
-            step = (int)Math.ceil(maxValue / 5.0); // un step approximatif
+            step = (int)Math.ceil(maxValue / 5.0);
         }
-
-        // Dessiner les lignes horizontales pour chaque graduation
         for (int val = 0; val <= maxValue; val += step) {
             float ratio = val / maxValue;
             float y = axisX_Y - ratio * chartHeight;
-            // petite ligne horizontale en pointillé
             canvas.drawLine(marginLeft, y, width - marginRight, y, dottedLinePaint);
-
-            // label du grad sur l'axe Y
             String label = String.valueOf(val);
             float labelWidth = textPaint.measureText(label);
             canvas.drawText(label, marginLeft - labelWidth - 10, y + 10, textPaint);
         }
 
-        // Calculer l'espacement horizontal pour 7 barres
-        float barSpace = chartWidth / 7f;
+        // Calculer l'espacement horizontal en fonction de la taille des données
+        int n = dataPoints.size();
+        float barSpace = chartWidth / n;
         float barWidth = barSpace * 0.6f;
-        float cornerRadius = 20f; // Rayon pour arrondir le haut des barres
+        float cornerRadius = 20f;
 
-        // Dessiner chaque barre
-        for (int i = 0; i < dataPoints.size(); i++) {
+        for (int i = 0; i < n; i++) {
             float value = dataPoints.get(i);
             float ratio = value / maxValue;
             float barHeight = ratio * chartHeight;
@@ -173,23 +161,22 @@ public class SimpleBarChartView extends View {
             float right = left + barWidth;
             float bottom = axisX_Y;
 
-            // Dessiner la barre arrondie en haut => RoundRect
             RectF rect = new RectF(left, top, right, bottom);
             canvas.drawRoundRect(rect, cornerRadius, cornerRadius, barPaint);
 
-            // Dessiner le label du jour
-            String dayLabel = dayLabels[i];
+            String dayLabel = xLabels[i];
             float textWidth = textPaint.measureText(dayLabel);
             float labelX = left + (barWidth - textWidth)/2f;
             float labelY = axisX_Y + textPaint.getTextSize() + 10f;
             canvas.drawText(dayLabel, labelX, labelY, textPaint);
 
-            // Afficher la valeur au-dessus de la barre
-            String valStr = String.format("%.1fh", value);
-            float valWidth = textPaint.measureText(valStr);
-            float valX = left + (barWidth - valWidth)/2f;
-            float valY = top - 8f;
-            canvas.drawText(valStr, valX, valY, textPaint);
+            if (value > 0){
+                String valStr = String.format("%.1fh", value);
+                float valWidth = textPaint.measureText(valStr);
+                float valX = left + (barWidth - valWidth)/2f;
+                float valY = top - 8f;
+                canvas.drawText(valStr, valX, valY, textPaint);
+            }
         }
     }
 }

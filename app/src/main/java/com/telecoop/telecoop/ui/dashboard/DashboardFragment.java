@@ -36,7 +36,7 @@ public class DashboardFragment extends Fragment {
 
     /**
      * Cette méthode utilise UsageStatsManager pour récupérer, depuis minuit jusqu'à maintenant,
-     * le temps d'utilisation réel de chaque application et renvoie une liste triée d'AppUsageInfo.
+     * le temps d'utilisation réel de chaque application et renvoie une liste triée d'AppUsageInfo
      */
     private List<AppUsageInfo> loadUsageInfos() {
         UsageStatsManager usageStatsManager = (UsageStatsManager) requireContext().getSystemService(Context.USAGE_STATS_SERVICE);
@@ -115,9 +115,7 @@ public class DashboardFragment extends Fragment {
         return usageInfos;
     }
 
-    /**
-     * Extrait les noms des topN applications à partir de loadUsageInfos().
-     */
+    //Extrait les noms des topN applications à partir de loadUsageInfos().
     private List<String> getTopUsedApps(int topN) {
         List<AppUsageInfo> usageInfos = loadUsageInfos();
         List<String> names = new ArrayList<>();
@@ -132,7 +130,7 @@ public class DashboardFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        // Gonflez le layout principal du Dashboard
+        // Gonfler le layout principal du Dashboard
         View root = inflater.inflate(R.layout.fragment_dashboard, container, false);
         viewPager = root.findViewById(R.id.viewPager);
         tabLayout = root.findViewById(R.id.tabLayout);
