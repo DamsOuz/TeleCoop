@@ -259,22 +259,44 @@ public class QuizzContentFragment extends Fragment {
         // Calculer et publier le résultat final dans le ViewModel
         viewModel.computeFinalProfiles();
 
-        List<Profile> topProfiles = viewModel.getTopProfiles();
+        // Observer le LiveData finalProfiles une seule fois
+        viewModel.getFinalProfiles().observe(getViewLifecycleOwner(), new androidx.lifecycle.Observer<List<Profile>>() {
+            @Override
+            public void onChanged(List<Profile> profiles) {
+                // Dès que la valeur est disponible, on la sauvegarde
+                if (profiles != null && !profiles.isEmpty()) {
+                    StringBuilder sb = new StringBuilder();
+                    for (Profile p : profiles) {
+                        sb.append(p.name()).append(",");
+                    }
+                    String csv = sb.toString();
+                    if (csv.endsWith(",")) {
+                        csv = csv.substring(0, csv.length() - 1);
+                    }
+                    SharedPreferences prefs = requireActivity().getSharedPreferences("QuizPrefs", Context.MODE_PRIVATE);
+                    prefs.edit().putString("finalProfilesCsv", csv).apply();
+                }
+                // Supprimer cet observateur pour ne pas le déclencher à nouveau
+                viewModel.getFinalProfiles().removeObserver(this);
 
-        StringBuilder sb = new StringBuilder("Merci de ta participation ! Voici ton/tes profil(s) :\n");
-        for (Profile p : topProfiles) {
-            sb.append("- ").append(p.name()).append("\n");
-        }
+                // Afficher le dialog des résultats
+                StringBuilder sbResult = new StringBuilder("Merci de ta participation ! Voici ton/tes profil(s) :\n");
+                List<Profile> topProfiles = viewModel.getTopProfiles();
+                for (Profile p : topProfiles) {
+                    sbResult.append("- ").append(p.name()).append("\n");
+                }
 
-        new AlertDialog.Builder(getActivity())
-                .setTitle("Terminé !")
-                .setMessage(sb.toString())
-                .setPositiveButton("Quit", (dialog, id) -> {
-                    NavController navController = NavHostFragment.findNavController(QuizzContentFragment.this);
-                    navController.navigate(R.id.action_quizzContentFragment_to_homeFragment);
-                })
-                .setNegativeButton("Annuler", (dialog, id) -> dialog.dismiss())
-                .show();
+                new android.app.AlertDialog.Builder(getActivity())
+                        .setTitle("Terminé !")
+                        .setMessage(sbResult.toString())
+                        .setPositiveButton("Quit", (dialog, id) -> {
+                            NavController navController = androidx.navigation.fragment.NavHostFragment.findNavController(QuizzContentFragment.this);
+                            navController.navigate(R.id.action_quizzContentFragment_to_homeFragment);
+                        })
+                        .setNegativeButton("Annuler", (dialog, id) -> dialog.dismiss())
+                        .show();
+            }
+        });
     }
 
     // Sauvegarde l'état actuel du quiz (question et réponse sélectionnée) dans SharedPreferences

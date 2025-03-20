@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.telecoop.telecoop.data.Profile;
 import com.telecoop.telecoop.data.Question;
+import com.telecoop.telecoop.data.QuestionBank;
 import com.telecoop.telecoop.data.QuestionRepository;
 
 import java.util.ArrayList;
@@ -36,6 +37,11 @@ public class QuizzViewModel extends ViewModel {
 
     public QuizzViewModel(QuestionRepository questionRepository) {
         this.questionRepository = questionRepository;
+    }
+
+    public QuizzViewModel() {
+        // Utilise la méthode getInstance() de QuestionBank pour obtenir une instance du repository
+        this(new QuestionRepository(QuestionBank.getInstance()));
     }
 
     public void startQuizz() {

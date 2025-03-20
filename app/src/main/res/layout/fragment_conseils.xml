@@ -4,10 +4,11 @@
     android:id="@+id/conseilsRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="#bbdafe">
 
-    <!-- Liste de boutons -->
+    <!-- On utilise un ScrollView englobant pour scroller si besoin -->
     <ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="16dp" >
@@ -17,61 +18,68 @@
             android:layout_height="wrap_content"
             android:orientation="vertical" >
 
-            <Button
-                android:id="@+id/btnTempsPositifs"
+            <!-- Conteneur pour "Actions suggérées" -->
+            <LinearLayout
+                android:id="@+id/containerActionsSuggerees"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Temps positifs"
-                android:layout_marginBottom="8dp" />
+                android:orientation="vertical"
+                android:layout_marginBottom="16dp">
 
-            <Button
-                android:id="@+id/btnGestionObjectifs"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Gestion des objectifs"
-                android:layout_marginBottom="8dp" />
+                <TextView
+                    android:id="@+id/txtActionsSuggerees"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Actions suggérées"
+                    android:textSize="35sp"
+                    android:textStyle="bold"
+                    android:gravity="center_horizontal"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="20dp" />
 
-            <Button
-                android:id="@+id/btnGestionNotifications"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Gestion des notifications"
-                android:layout_marginBottom="8dp" />
+                <!-- Ici on ajoute dynamiquement les boutons suggérés -->
+                <LinearLayout
+                    android:id="@+id/layoutActionsSuggerees"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"/>
+            </LinearLayout>
 
-            <Button
-                android:id="@+id/btnTutorielNotifs"
+            <!-- Conteneur pour "Autres actions" -->
+            <LinearLayout
+                android:id="@+id/containerAutresActions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Tutoriel notifications"
-                android:layout_marginBottom="8dp" />
+                android:orientation="vertical"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="16dp">
 
-            <Button
-                android:id="@+id/btnTutorielBlocage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Tutoriel blocage"
-                android:layout_marginBottom="8dp" />
+                <TextView
+                    android:id="@+id/txtAutresActions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Autres actions"
+                    android:textSize="35sp"
+                    android:textStyle="bold"
+                    android:gravity="center_horizontal"
+                    android:layout_marginBottom="20dp" />
 
-            <Button
-                android:id="@+id/btnTutorielFiltresCouleurs"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Tutoriel filtres couleurs"
-                android:layout_marginBottom="8dp" />
-
-            <Button
-                android:id="@+id/btnTutorielModeTravail"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Tutoriel mode travail"
-                android:layout_marginBottom="8dp" />
+                <!-- Ici on ajoute dynamiquement les autres boutons -->
+                <LinearLayout
+                    android:id="@+id/layoutAutresActions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"/>
+            </LinearLayout>
 
             <Button
                 android:id="@+id/btnRefaireQuizz"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Refaire le quizz"
-                android:layout_marginTop="16dp"
+                android:backgroundTint="#74d0f1"
+                android:textSize="20dp"
+                android:layout_marginTop="25dp"
                 android:layout_marginBottom="16dp" />
 
         </LinearLayout>
@@ -83,8 +91,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#FFFFFF"
-        android:visibility="gone"
-        xmlns:android="http://schemas.android.com/apk/res/android">
+        android:visibility="gone">
 
         <!-- Titre de l'overlay -->
         <TextView

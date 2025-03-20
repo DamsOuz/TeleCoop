@@ -8,6 +8,9 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="red">#FF0000</color>
+    <color name="bleuCiel">#74d0f1</color>
+    <color name="textContentButton">#189AB4</color>
+    <color name="bleuAzur">#1E7FCB</color>
     <color name="active_button_color">#FF000000</color> <!-- à modifier plus tard -->
     <color name="inactive_button_color">#FFFFFFFF</color> <!-- à modifier plus tard -->
 </resources>

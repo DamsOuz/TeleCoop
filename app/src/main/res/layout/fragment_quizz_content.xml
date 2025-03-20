@@ -38,7 +38,7 @@
             android:layout_margin="4dp"
             android:paddingHorizontal="32dp"
             android:textSize="22sp"
-            android:textColor="#189AB4"
+            android:textColor="@color/textContentButton"
             android:backgroundTint="@color/white"
             android:text="Answer1" />
 
@@ -50,7 +50,7 @@
             android:layout_margin="4dp"
             android:paddingHorizontal="32dp"
             android:textSize="22sp"
-            android:textColor="#189AB4"
+            android:textColor="@color/textContentButton"
             android:backgroundTint="@color/white"
             android:text="Answer2" />
 
@@ -62,7 +62,7 @@
             android:layout_margin="4dp"
             android:paddingHorizontal="32dp"
             android:textSize="22sp"
-            android:textColor="#189AB4"
+            android:textColor="@color/textContentButton"
             android:backgroundTint="@color/white"
             android:text="Answer3" />
 
@@ -74,7 +74,7 @@
             android:layout_margin="4dp"
             android:paddingHorizontal="32dp"
             android:textSize="22sp"
-            android:textColor="#189AB4"
+            android:textColor="@color/textContentButton"
             android:backgroundTint="@color/white"
             android:text="Answer4" />
 
@@ -86,7 +86,7 @@
             android:layout_margin="4dp"
             android:paddingHorizontal="32dp"
             android:textSize="22sp"
-            android:textColor="#189AB4"
+            android:textColor="@color/textContentButton"
             android:backgroundTint="@color/white"
             android:text="Answer5" />
 
@@ -98,7 +98,7 @@
             android:layout_margin="4dp"
             android:paddingHorizontal="32dp"
             android:textSize="22sp"
-            android:textColor="#189AB4"
+            android:textColor="@color/textContentButton"
             android:backgroundTint="@color/white"
             android:text="Answer6" />
 
@@ -111,7 +111,7 @@
             android:padding="16dp"
             android:textSize="22sp"
             android:textColor="@color/white"
-            android:backgroundTint="#74d0f1"
+            android:backgroundTint="@color/bleuCiel"
             android:text="NEXT" />
 
     </LinearLayout>

@@ -8,37 +8,37 @@ public class ContentProvider {
         switch (type) {
             case "temps_positifs":
                 return new Content(
-                        "Temps Positifs",
+                        "Programmer des temps positifs quotidiens",
                         "Ceci est le contenu textuel des temps positifs",
                         null
                 );
             case "gestion_objectifs":
                 return new Content(
-                        "Gestion des objectifs",
+                        "Fixer des horaires d'utilisation par application",
                         "Ceci est le contenu textuel de la gestion des objectifs",
                         null
                 );
             case "gestion_notifications":
                 return new Content(
-                        "Gestion des notifications",
+                        "Conscientiser mon utilisation du téléphone via des notifications",
                         "Ceci est le contenu textuel de la gestion des notifications",
                         null
                 );
             case "tutoriel_notifications":
                 return new Content(
-                        "Tutoriel notifications",
+                        "Tutoriel : mieux gérer mes notifications",
                         "Ceci est le contenu textuel du tutoriel sur les notifications",
                         null
                 );
             case "tutoriel_blocage":
                 return new Content(
-                        "Tutoriel blocage",
+                        "Tutoriel : limiter l'utilisation d'application par un blocage",
                         "Ceci est le contenu textuel du tutoriel sur les blocages",
                         null
                 );
             case "tutoriel_filtres_couleurs":
                 return new Content(
-                        "Tutoriel filtres couleurs",
+                        "Tutoriel : instaurer des filtres de couleurs",
                         "Bienvenue dans le tutoriel sur les filtres couleurs.\n\n" +
                                 "Dans cette section, vous apprendrez à appliquer et ajuster des filtres pour modifier l'apparence de vos images ou éléments graphiques.\n" +
                                 "1. Sélectionnez l'image ou l'élément à modifier.\n" +
@@ -50,7 +50,7 @@ public class ContentProvider {
                 );
             case "tutoriel_mode_travail":
                 return new Content(
-                        "Tutoriel mode travail",
+                        "Tutoriel : instaurer des temps de concentration",
                         "Ceci est le contenu textuel du tutoriel sur le mode travail",
                         null
                 );
