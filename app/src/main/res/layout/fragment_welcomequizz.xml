@@ -14,7 +14,7 @@
         android:layout_margin="30dp"
         android:padding="30dp"
         android:textAlignment="center"
-        android:textSize="50sp"
+        android:textSize="43sp"
         android:textColor="@color/black"
         app:layout_constraintBottom_toTopOf="@id/text_firstname"
         app:layout_constraintEnd_toEndOf="parent"
@@ -57,5 +57,19 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0.2"
         app:layout_constraintTop_toBottomOf="@+id/text_hintname" />
+
+        <TextView
+        android:id="@+id/text_bas_welcomequizz"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:padding="30dp"
+        android:textAlignment="center"
+        android:textSize="25sp"
+        app:layout_constraintTop_toBottomOf="@+id/text_button_firstpage_quizz"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

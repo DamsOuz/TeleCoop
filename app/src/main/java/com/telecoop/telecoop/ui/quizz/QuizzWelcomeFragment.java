@@ -18,7 +18,12 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import com.telecoop.telecoop.R;
+import com.telecoop.telecoop.data.AnswerChoice;
+import com.telecoop.telecoop.data.Question;
+import com.telecoop.telecoop.data.QuestionBank;
 import com.telecoop.telecoop.databinding.FragmentWelcomequizzBinding;
+
+import java.util.ArrayList;
 
 public class QuizzWelcomeFragment extends Fragment {
 
@@ -41,11 +46,13 @@ public class QuizzWelcomeFragment extends Fragment {
         final TextView textViewName = binding.textFirstname;
         final EditText textViewHintName = binding.textHintname;
         final TextView textButton = binding.textButtonFirstpageQuizz;
+        final TextView textBasPageButton = binding.textBasWelcomequizz;
 
         quizzViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         quizzViewModel.getTextName().observe(getViewLifecycleOwner(), textViewName::setText);
         quizzViewModel.getTextHintName().observe(getViewLifecycleOwner(), textViewHintName::setHint);
         quizzViewModel.getTextButton().observe(getViewLifecycleOwner(), textButton::setText);
+        quizzViewModel.getTextBasDePage().observe(getViewLifecycleOwner(), textBasPageButton::setText);
 
         // Restaure le nom de l'utilisateur s'il a été sauvegardé
         SharedPreferences prefs = requireActivity().getSharedPreferences("QuizPrefs", Context.MODE_PRIVATE);
@@ -72,6 +79,22 @@ public class QuizzWelcomeFragment extends Fragment {
         });
 
         binding.textButtonFirstpageQuizz.setOnClickListener(v -> {
+            String userName = textViewHintName.getText().toString().trim();
+
+            QuestionBank qb = QuestionBank.getInstance();
+            // Ajouter la question personnalisée dans le QuestionBank
+            Question addNameQuestion = qb.getAddNameQuestion("", userName,
+                    ",\n\nNous allons te poser" + qb.getBaseQuestionCount() + "questions afin de mieux connaître tes besoins et tes priorités.\n\nN'hésite pas à cocher plusieurs réponses si elles te semblent toutes pertinentes !",
+                    new ArrayList<AnswerChoice>());
+
+
+            if (!qb.getQuestions().contains(addNameQuestion)){
+                qb.addNameQuestion("", userName,
+                        ",\n\nNous allons te poser " + qb.getBaseQuestionCount() + " questions afin de mieux connaître tes besoins et tes priorités.\n\nN'hésite pas à cocher plusieurs réponses si elles te semblent toutes pertinentes !",
+                        0,
+                        new ArrayList<AnswerChoice>());
+            }
+
             NavController navController = Navigation.findNavController(v);
             navController.navigate(R.id.action_quizzWelcomeFragment_to_quizzContentFragment);
             Log.d("Damien", "Navigation vers QuizzContentFragment !");

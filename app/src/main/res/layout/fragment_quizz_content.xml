@@ -114,5 +114,22 @@
             android:backgroundTint="@color/bleuCiel"
             android:text="NEXT" />
 
+        <!-- Espace pour pousser le compteur vers le bas -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <!-- Compteur de questions en bas à droite -->
+        <TextView
+            android:id="@+id/txtQuestionIndex"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1/9"
+            android:textSize="21sp"
+            android:textColor="@android:color/black"
+            android:padding="8dp"
+            android:layout_margin="8dp"/>
+
     </LinearLayout>
 </ScrollView>

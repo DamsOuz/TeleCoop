@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.telecoop.telecoop.R;
 import com.telecoop.telecoop.data.AnswerChoice;
@@ -84,6 +85,7 @@ public class QuizzContentFragment extends Fragment {
             currentQuestionIndex = 0;
             viewModel.currentQuestion.postValue(questionOrder.get(0));
         }
+        updateQuestionCounter();
         updateNextButtonText();
 
         // Active le bouton "retour" dans la barre d'action
@@ -137,6 +139,7 @@ public class QuizzContentFragment extends Fragment {
             if(currentQuestionIndex < questionOrder.size() - 1) {
                 currentQuestionIndex++;
                 viewModel.currentQuestion.postValue(questionOrder.get(currentQuestionIndex));
+                updateQuestionCounter();
                 updateNextButtonText();
             } else {
                 saveQuizState();
@@ -169,6 +172,7 @@ public class QuizzContentFragment extends Fragment {
             currentQuestionIndex--;
             viewModel.currentQuestion.postValue(questionOrder.get(currentQuestionIndex));
             restoreSelectedAnswers();
+            updateQuestionCounter();
             updateNextButtonText();
             saveQuizState();
         } else {
@@ -358,13 +362,38 @@ public class QuizzContentFragment extends Fragment {
      * et incrémente les scores des profils correspondants dans le ViewModel
      */
     private void restoreProfileScores() {
+        // Parcourir chaque entrée (clé: questionIndex, valeur: set d'indices de réponses sélectionnées)
         for (Map.Entry<Integer, Set<Integer>> entry : selectedAnswerIndicesMap.entrySet()) {
             int questionIndex = entry.getKey();
+            // Vérifier que l'index de question est valide
+            if (questionIndex < 0 || questionIndex >= questionOrder.size()) {
+                Log.e("restoreProfileScores", "Question index invalide: " + questionIndex);
+                continue;
+            }
+            List<AnswerChoice> choices = questionOrder.get(questionIndex).getAnswerChoices();
             Set<Integer> answerSet = entry.getValue();
             for (Integer answerIndex : answerSet) {
-                AnswerChoice choice = questionOrder.get(questionIndex).getAnswerChoices().get(answerIndex);
+                // Vérifier que l'indice de réponse est dans les limites de la liste des choix pour la question
+                if (answerIndex < 0 || answerIndex >= choices.size()) {
+                    Log.e("restoreProfileScores", "Invalid answer index " + answerIndex + " for question index " + questionIndex +
+                            " (nombre de réponses: " + choices.size() + ")");
+                    continue;
+                }
+                AnswerChoice choice = choices.get(answerIndex);
                 viewModel.incrementProfiles(choice.getAssociatedProfiles());
             }
+        }
+    }
+
+    private void updateQuestionCounter() {
+        TextView txtQuestionIndex = getView().findViewById(R.id.txtQuestionIndex);
+
+        if (currentQuestionIndex == 0){
+            txtQuestionIndex.setVisibility(View.GONE);
+        } else if (txtQuestionIndex != null && questionOrder != null && !questionOrder.isEmpty()) {
+            txtQuestionIndex.setVisibility(View.VISIBLE);
+            // Affiche la question actuelle sur le nombre total en décalant tout de 1 (car on ne compte pas la 1ere page comme une question)
+            txtQuestionIndex.setText(currentQuestionIndex + "/" + (questionOrder.size()-1));
         }
     }
 

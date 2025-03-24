@@ -1,12 +1,18 @@
 package com.telecoop.telecoop.data;
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 public class QuestionBank {
 
-    public List<Question> getQuestions(){
-        return Arrays.asList(
+    private static QuestionBank instance;
+    private List<Question> questions;
+    private final int baseQuestionCount; //nombre initial de questions fixes
+
+    private QuestionBank(){
+        questions = new ArrayList<>(Arrays.asList(
                 new Question("Quelle est ta qualité de sommeil ?",
                         Arrays.asList(
                                 new AnswerChoice(
@@ -182,14 +188,66 @@ public class QuestionBank {
                                         Arrays.asList(Profile.AUTOMATISME)
                                 )
                         ))
-        );
+        ));
+
+        // Stocke le nombre initial de questions fixes
+        baseQuestionCount = questions.size();
     }
 
-    private static QuestionBank instance;
+    public int getBaseQuestionCount(){
+        return baseQuestionCount;
+    }
+
+    public List<Question> getQuestions(){
+        return questions;
+    }
+
     public static QuestionBank getInstance(){
         if (instance == null){
             instance = new QuestionBank();
         }
         return instance;
+    }
+
+    // Ajoute une question faisant référence au prénom
+    public void addNameQuestion(String beforeName, String userName, String afterName, int index, List<AnswerChoice> answerChoices) {
+        if (index < 0) index = 0;
+        if (index > questions.size()) index = questions.size();
+
+        // Supprimer la question si elle existe déjà avec un autre prénom
+        removeNameQuestions(beforeName + afterName);
+
+        Question nameQuestion = new Question(
+                beforeName + userName + afterName,
+                answerChoices
+        );
+
+        // Ajouter cette question à l'index de notre choix
+        questions.add(index, nameQuestion);
+    }
+
+    public void removeNameQuestions(String questionWithoutUsername) {
+
+        // On enlève le fait que les chiffres puissent faire une différence dans le String initial
+        String output = questionWithoutUsername.replaceAll("[0-9]", "");
+
+        // Utiliser un Iterator pour éviter les ConcurrentModificationException
+        Iterator<Question> iterator = questions.iterator();
+        while (iterator.hasNext()) {
+            Question q = iterator.next();
+            String questionText = q.getQuestion().replaceAll("[0-9]", "");
+            if (questionText != null && questionText.contains(output)) {
+                iterator.remove();
+            }
+        }
+    }
+
+    public Question getAddNameQuestion(String beforeName, String userName, String afterName, List<AnswerChoice> answerChoices){
+        Question nameQuestion = new Question(
+                beforeName + userName + afterName,
+                answerChoices
+        );
+
+        return nameQuestion;
     }
 }
