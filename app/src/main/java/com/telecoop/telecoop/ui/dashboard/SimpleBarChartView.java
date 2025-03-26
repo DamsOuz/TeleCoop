@@ -15,7 +15,7 @@ public class SimpleBarChartView extends View {
 
     private List<Float> dataPoints; // Liste de valeurs (peut être 7, 4, 12 etc...)
     private String[] xLabels; // Labels pour l'axe X (de même taille que dataPoints)
-
+    private String unitSuffix = "h";
     private Paint barPaint;
     private Paint axisPaint;
     private Paint textPaint;
@@ -77,6 +77,12 @@ public class SimpleBarChartView extends View {
             throw new IllegalArgumentException("Les labels ne peuvent être vides.");
         }
         this.xLabels = labels;
+        invalidate();
+    }
+
+    // Permet de configurer le suffixe
+    public void setUnitSuffix(String suffix) {
+        this.unitSuffix = suffix;
         invalidate();
     }
 
@@ -171,7 +177,7 @@ public class SimpleBarChartView extends View {
             canvas.drawText(dayLabel, labelX, labelY, textPaint);
 
             if (value > 0){
-                String valStr = String.format("%.1fh", value);
+                String valStr = String.format("%.1f%s", value, unitSuffix);
                 float valWidth = textPaint.measureText(valStr);
                 float valX = left + (barWidth - valWidth)/2f;
                 float valY = top - 8f;

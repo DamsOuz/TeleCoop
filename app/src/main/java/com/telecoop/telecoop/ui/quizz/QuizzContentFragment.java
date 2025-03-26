@@ -177,8 +177,8 @@ public class QuizzContentFragment extends Fragment {
             saveQuizState();
         } else {
             new AlertDialog.Builder(requireContext())
-                    .setTitle("Quitter le Quiz ?")
-                    .setMessage("Voulez-vous vraiment quitter le quiz ?")
+                    .setTitle("Quitter le Quizz ?")
+                    .setMessage("Veux-tu vraiment quitter le quizz ?")
                     .setPositiveButton("Oui", (dialog, id) -> {
                         NavController navController = NavHostFragment.findNavController(QuizzContentFragment.this);
                         navController.navigate(R.id.action_quizzContentFragment_to_homeFragment);

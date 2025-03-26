@@ -110,6 +110,97 @@
                 android:layout_marginStart="8dp" />
         </LinearLayout>
 
+        <!-- Titre du graphique ressenti -->
+        <TextView
+            android:id="@+id/txtChartTitleRessenti"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ressenti d'utilisation de l'application"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="20dp" />
+
+        <!-- Barre horizontale contenant le Spinner et les flèches -->
+        <LinearLayout
+            android:id="@+id/scaleAndArrowsContainerRessenti"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+
+            <!-- Sélection de l'échelle de temps (jour/semaine/mois) -->
+            <Spinner
+                android:id="@+id/spinnerScaleRessenti"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:entries="@array/scale_options"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- Espace flexible pour pousser les flèches à droite -->
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <!-- Bouton flèche gauche -->
+            <!-- Flèche gauche -->
+            <ImageView
+                android:id="@+id/ivPrevRessenti"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_arrow_left"
+                android:padding="8dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <!-- Flèche droite -->
+            <ImageView
+                android:id="@+id/ivNextRessenti"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_arrow_right"
+                android:padding="8dp"
+                android:clickable="true"
+                android:focusable="true" />
+        </LinearLayout>
+
+        <!-- Vue personnalisée pour le graphique -->
+        <com.telecoop.telecoop.ui.dashboard.SimpleBarChartView
+            android:id="@+id/simpleBarChartViewRessenti"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Conteneur pour la légende -->
+        <LinearLayout
+            android:id="@+id/legendContainerRessenti"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="16dp">
+
+            <!-- Vue pour la ligne pointillée -->
+            <View
+                android:id="@+id/dashedLineRessenti"
+                android:layout_width="30dp"
+                android:layout_height="4dp"
+                android:background="@drawable/dashed_line" />
+
+            <!-- TextView pour afficher la moyenne -->
+            <TextView
+                android:id="@+id/txtLegendRessenti"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=": 0.0h"
+                android:textSize="16sp"
+                android:layout_marginStart="8dp" />
+        </LinearLayout>
+
         <!-- Texte "Cette semaine, vous avez utilisé..." -->
         <TextView
             android:id="@+id/txtUsageReasons"

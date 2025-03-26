@@ -29,12 +29,13 @@ public class AppTabFragment extends Fragment {
     private String appName;
 
     // Vue graphique et légende
-    private SimpleBarChartView barChartView;
-    private Spinner spinnerScale;
-    private TextView txtLegend, txtAppTitle, txtUsageReasons;
-    private ImageView ivPrev, ivNext;
+    private SimpleBarChartView barChartView, barChartViewRessenti;
+    private Spinner spinnerScale, spinnerScaleRessenti;
+    private TextView txtLegend, txtLegendRessenti, txtAppTitle, txtUsageReasons;
+    private ImageView ivPrev, ivNext, ivPrevRessenti, ivNextRessenti;
     // Stocke l'option sélectionnée dans le Spinner
     private String selectedScale = "Jours de la semaine";
+    private String selectedScaleRessenti = "Jours de la semaine";
     // Représente la date "réelle" d'aujourd'hui, pour savoir ce qui est futur ou passé
     private Calendar todayCal;
     // Représente la date actuellement affichée (qu'on modifie en cliquant sur les flèches)
@@ -68,13 +69,14 @@ public class AppTabFragment extends Fragment {
         txtUsageReasons = root.findViewById(R.id.txtUsageReasons);
         txtUsageReasons.setText("Cette période, vous avez utilisé " + appName + " pour :");
 
+        // Graphique temps d'utilisation
         barChartView = root.findViewById(R.id.simpleBarChartView);
         spinnerScale = root.findViewById(R.id.spinnerScale);
         txtLegend = root.findViewById(R.id.txtLegend);
         ivPrev = root.findViewById(R.id.ivPrev);
         ivNext = root.findViewById(R.id.ivNext);
 
-        // Configurer le spinner d'échelle
+        // Configurer le spinner d'échelle (temps d'utilisation)
         ArrayAdapter<CharSequence> scaleAdapter = ArrayAdapter.createFromResource(requireContext(),
                 R.array.scale_options, android.R.layout.simple_spinner_item);
         scaleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -106,6 +108,48 @@ public class AppTabFragment extends Fragment {
 
         // Premier affichage
         updateChartForScale(selectedScale);
+
+
+        // Graphique ressenti
+        spinnerScaleRessenti = root.findViewById(R.id.spinnerScaleRessenti);
+        ivPrevRessenti = root.findViewById(R.id.ivPrevRessenti);
+        ivNextRessenti = root.findViewById(R.id.ivNextRessenti);
+        barChartViewRessenti = root.findViewById(R.id.simpleBarChartViewRessenti);
+        barChartViewRessenti.setUnitSuffix("");
+        txtLegendRessenti = root.findViewById(R.id.txtLegendRessenti);
+
+        // Configurer le spinner d'échelle (Ressenti)
+        ArrayAdapter<CharSequence> scaleAdapterRessenti = ArrayAdapter.createFromResource(requireContext(),
+                R.array.scale_options, android.R.layout.simple_spinner_item);
+        scaleAdapterRessenti.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerScaleRessenti.setAdapter(scaleAdapterRessenti);
+
+        // Par défaut "Jours de la semaine"
+        spinnerScaleRessenti.setSelection(0);
+        selectedScaleRessenti = "Jours de la semaine";
+
+        spinnerScaleRessenti.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedScaleRessenti = parent.getItemAtPosition(position).toString();
+                updateRessentiChartForScale(selectedScaleRessenti);
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) { }
+        });
+
+        // Gérer les flèches ressenti
+        ivPrevRessenti.setOnClickListener(v -> {
+            navigateInPast();
+            updateRessentiChartForScale(selectedScaleRessenti);
+        });
+        ivNextRessenti.setOnClickListener(v -> {
+            navigateInFuture();
+            updateRessentiChartForScale(selectedScaleRessenti);
+        });
+
+        // Premier affichage
+        updateRessentiChartForScale("Jours de la semaine");
 
         return root;
     }
@@ -184,8 +228,46 @@ public class AppTabFragment extends Fragment {
         txtLegend.setText(": " + String.format("%.1fh", avg));
     }
 
+    // Gérer le graphique de ressenti
+    private void updateRessentiChartForScale(String scaleOption) {
+        List<Float> data;
+        String[] labels;
+        float avg;
+
+        switch (scaleOption) {
+            case "Jours de la semaine":
+                // Génère des ENTIERs (1..5), convertis en float
+                data = generateDailyRessentiDataWithFutureCheck(currentCal, todayCal);
+                labels = new String[]{"L", "M", "M", "J", "V", "S", "D"};
+                break;
+            case "Semaines du mois":
+                data = generateWeeklyRessentiDataWithFutureCheck(currentCal, todayCal);
+                // Nombre de semaines dans le mois
+                Calendar tmp = (Calendar) currentCal.clone();
+                int maxWeeks = tmp.getActualMaximum(Calendar.WEEK_OF_MONTH);
+                labels = new String[maxWeeks];
+                for (int i = 0; i < maxWeeks; i++) {
+                    labels[i] = "S" + (i + 1);
+                }
+                break;
+            case "Mois de l'année":
+                data = generateMonthlyRessentiDataWithFutureCheck(currentCal, todayCal);
+                labels = new String[]{"Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct", "Nov", "Déc"};
+                break;
+            default:
+                data = generateDailyRessentiDataWithFutureCheck(currentCal, todayCal);
+                labels = new String[]{"L", "M", "M", "J", "V", "S", "D"};
+                break;
+        }
+
+        avg = calculateAverageNonZero(data);
+        barChartViewRessenti.setDataPoints(data);
+        barChartViewRessenti.setXLabels(labels);
+        txtLegendRessenti.setText(": " + String.format("%.1f", avg));
+    }
+
     /**
-     * Génère 7 valeurs (lundi->dimanche) pour la semaine de currentCal
+     * Génère 7 valeurs float entre 1 et 24 (lundi->dimanche) pour la semaine de currentCal
      * Si le jour est dans le futur par rapport à todayCal, la valeur est 0
      */
     private List<Float> generateDailyDataWithFutureCheck(Calendar currentCal, Calendar todayCal) {
@@ -208,7 +290,31 @@ public class AppTabFragment extends Fragment {
     }
 
     /**
-     * Génère un tableau pour les semaines du mois de currentCal
+     * Génère 7 valeurs entières entre 1 et 5 (lundi->dimanche) pour la semaine de currentCal
+     * Si le jour est dans le futur par rapport à todayCal, la valeur est 0
+     */
+    private List<Float> generateDailyRessentiDataWithFutureCheck(Calendar currentCal, Calendar todayCal) {
+        List<Float> daily = new ArrayList<>();
+        Calendar cloneCal = (Calendar) currentCal.clone();
+        // Se placer au lundi de la semaine
+        cloneCal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+
+        Random rand = new Random();
+        for (int i = 0; i < 7; i++) {
+            if (cloneCal.after(todayCal)) {
+                daily.add(0f);
+            } else {
+                // ENTIER entre 1 et 5
+                int rating = 1 + rand.nextInt(5);
+                daily.add((float) rating);
+            }
+            cloneCal.add(Calendar.DAY_OF_MONTH, 1);
+        }
+        return daily;
+    }
+
+    /**
+     * Génère un tableau pour les semaines du mois de currentCal avec des valeurs entre 1 et 24
      * Si la semaine est dans le futur, on met 0
      */
     private List<Float> generateWeeklyDataWithFutureCheck(Calendar currentCal, Calendar todayCal) {
@@ -234,7 +340,35 @@ public class AppTabFragment extends Fragment {
     }
 
     /**
-     * Génère 12 valeurs pour l'année de currentCal
+     * Génère un tableau pour les semaines du mois de currentCal avec des valeurs entre 1 et 5
+     * Si la semaine est dans le futur, on met 0
+     */
+    private List<Float> generateWeeklyRessentiDataWithFutureCheck(Calendar currentCal, Calendar todayCal) {
+        List<Float> weekly = new ArrayList<>();
+        Calendar cloneCal = (Calendar) currentCal.clone();
+        // Nombre total de semaines
+        int maxWeeks = cloneCal.getActualMaximum(Calendar.WEEK_OF_MONTH);
+
+        // Se placer au début du mois
+        cloneCal.set(Calendar.DAY_OF_MONTH, 1);
+
+        Random rand = new Random();
+        for (int i = 0; i < maxWeeks; i++) {
+            if (cloneCal.after(todayCal)) {
+                weekly.add(0f);
+            } else {
+                // Float entre 1 et 5
+                weekly.add(1f + rand.nextFloat() * 4f);
+            }
+            // Passer à la semaine suivante
+            cloneCal.add(Calendar.WEEK_OF_MONTH, 1);
+        }
+        return weekly;
+    }
+
+
+    /**
+     * Génère 12 valeurs pour l'année de currentCal entre 1 et 24
      * Si le mois est dans le futur, on met 0
      */
     private List<Float> generateMonthlyDataWithFutureCheck(Calendar currentCal, Calendar todayCal) {
@@ -251,6 +385,31 @@ public class AppTabFragment extends Fragment {
                 monthly.add(0f);
             } else {
                 monthly.add(1f + rand.nextFloat() * 23f);
+            }
+            // Passer au mois suivant
+            cloneCal.add(Calendar.MONTH, 1);
+        }
+        return monthly;
+    }
+
+    /**
+     * Génère 12 valeurs pour l'année de currentCal entre 1 et 5
+     * Si le mois est dans le futur, on met 0
+     */
+    private List<Float> generateMonthlyRessentiDataWithFutureCheck(Calendar currentCal, Calendar todayCal) {
+        List<Float> monthly = new ArrayList<>();
+        Calendar cloneCal = (Calendar) currentCal.clone();
+        // Se placer au début de l'année
+        cloneCal.set(Calendar.MONTH, Calendar.JANUARY);
+        cloneCal.set(Calendar.DAY_OF_MONTH, 1);
+
+        Random rand = new Random();
+        for (int i = 0; i < 12; i++) {
+            // Si ce mois est dans le futur par rapport à todayCal
+            if (cloneCal.after(todayCal)) {
+                monthly.add(0f);
+            } else {
+                monthly.add(1f + rand.nextFloat() * 4f);
             }
             // Passer au mois suivant
             cloneCal.add(Calendar.MONTH, 1);
