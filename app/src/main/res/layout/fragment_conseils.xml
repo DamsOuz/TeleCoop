@@ -85,49 +85,59 @@
         </LinearLayout>
     </ScrollView>
 
+
     <!-- Overlay (zone blanche) caché par défaut -->
-    <RelativeLayout
+    <ScrollView
         android:id="@+id/overlayContainer"
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#FFFFFF"
         android:visibility="gone">
 
-        <!-- Titre de l'overlay -->
-        <TextView
-            android:id="@+id/txtOverlayTitle"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_margin="16dp"/>
+            android:orientation="vertical">
 
-        <!-- Contenu textuel de l'overlay -->
-        <TextView
-            android:id="@+id/txtOverlayContent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/txtOverlayTitle"
-            android:layout_margin="16dp"/>
+            <!-- Titre de l'overlay -->
+            <TextView
+                android:id="@+id/txtOverlayTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="30sp"
+                android:textStyle="bold"
+                android:gravity="center_horizontal"
+                android:layout_margin="16dp"/>
 
-        <!-- Image à afficher dans l'overlay -->
-        <ImageView
-            android:id="@+id/imgOverlay"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/txtOverlayContent"
-            android:layout_margin="16dp"
-            android:visibility="gone"/>
+            <!-- Contenu textuel de l'overlay -->
+            <TextView
+                android:id="@+id/txtOverlayContent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txtOverlayTitle"
+                android:gravity="center_horizontal"
+                android:textSize="23sp"
+                android:layout_margin="16dp"/>
 
-        <!-- Bouton "Fermer" -->
-        <Button
-            android:id="@+id/btnCloseOverlay"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Fermer"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="32dp"/>
-    </RelativeLayout>
+            <!-- Image à afficher dans l'overlay -->
+            <ImageView
+                android:id="@+id/imgOverlay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txtOverlayContent"
+                android:layout_margin="16dp"
+                android:visibility="gone"/>
+
+            <!-- Bouton "Fermer" -->
+            <Button
+                android:id="@+id/btnCloseOverlay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Fermer"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="32dp"/>
+        </LinearLayout>
+    </ScrollView>
 
 </FrameLayout>

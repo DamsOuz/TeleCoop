@@ -15,6 +15,17 @@
         android:padding="16dp"
         android:gravity="center_horizontal">
 
+        <!-- Texte explicatif temps positifs -->
+        <TextView
+            android:id="@+id/txtTempsPositifsDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ajouter des temps positifs, ça va te faire du bien ! Planifie ton temps pour passer une bonne journée :)"
+            android:textSize="23sp"
+            android:textStyle="bold"
+            android:gravity="center_horizontal"
+            android:layout_marginBottom="10dp"/>
+
         <!-- Bouton "Ajouter un temps positif" -->
         <Button
             android:id="@+id/btnAddTempsPositif"
@@ -34,7 +45,7 @@
             android:text="Mes temps positifs"
             android:textSize="35sp"
             android:textStyle="bold"
-            android:layout_marginTop="45dp"/>
+            android:layout_marginTop="40dp"/>
 
         <!-- Liste des temps positifs -->
         <androidx.recyclerview.widget.RecyclerView
