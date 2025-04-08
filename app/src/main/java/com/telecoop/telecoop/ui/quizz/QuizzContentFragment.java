@@ -243,6 +243,13 @@ public class QuizzContentFragment extends Fragment {
 
     // Active ou désactive le bouton NEXT en fonction de si une réponse est sélectionnée
     private void checkIfNextShouldBeEnabled() {
+
+        if (currentQuestionIndex == 0) {
+            binding.next.setEnabled(true);
+            binding.next.setTextColor(Color.WHITE);
+            return;
+        }
+
         Set<Integer> selectedSet = selectedAnswerIndicesMap.get(currentQuestionIndex);
         boolean isAnySelected = (selectedSet != null && !selectedSet.isEmpty());
         binding.next.setEnabled(isAnySelected);
